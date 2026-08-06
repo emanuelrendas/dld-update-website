@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+
+Sitemap: https://lux-real-estate-dubai.vercel.app/sitemap.xml
