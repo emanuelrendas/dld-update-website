@@ -919,3 +919,68 @@ footer{view-transition-name:site-footer;}
   .share-bar .sb-act{width:100%;}
   .share-bar .sb-act .btn{flex:1;justify-content:center;min-width:100%;}
 }
+
+/* ─────────── 19. Side-by-side community comparison (/addresses) ─────────── */
+.cmp-bar{margin-top:26px;padding-top:24px;border-top:1px solid var(--line);}
+.cmp-bar .cmp-l{display:block;font-size:11px;letter-spacing:2.6px;text-transform:uppercase;
+  color:var(--champagne);font-weight:700;margin-bottom:10px;}
+.cmp-bar select{width:100%;background:var(--void);border:1px solid var(--line);color:var(--ivory);
+  padding:14px 44px 14px 16px;font-size:14.5px;font-family:'Inter',sans-serif;min-height:50px;
+  -webkit-appearance:none;appearance:none;cursor:pointer;outline:none;transition:border-color .25s;
+  background-image:linear-gradient(45deg,transparent 50%,var(--champagne) 50%),
+                   linear-gradient(135deg,var(--champagne) 50%,transparent 50%);
+  background-position:calc(100% - 19px) calc(50% + 1px),calc(100% - 13px) calc(50% + 1px);
+  background-size:6px 6px,6px 6px;background-repeat:no-repeat;}
+.cmp-bar select:hover{border-color:rgba(196,162,101,0.34);}
+.cmp-bar select:focus{border-color:var(--champagne);box-shadow:0 0 0 3px rgba(196,162,101,0.10);}
+.cmp-bar select option{background:var(--coal);color:var(--ivory);}
+.cmp-out[hidden]{display:none;}
+.cmp-out{margin-top:20px;}
+.cmp-tbl{width:100%;border-collapse:collapse;border:1px solid var(--line);}
+.cmp-tbl thead th{font-family:'Cormorant Garamond',serif;font-size:17px;color:var(--champ-hi);
+  font-weight:500;text-align:right;padding:13px 14px;border-bottom:1px solid var(--line);
+  background:rgba(196,162,101,0.05);}
+.cmp-tbl thead th:first-child{width:38%;}
+.cmp-tbl tbody th{text-align:left;font-weight:400;font-size:12.5px;color:var(--smoke);
+  padding:11px 14px;border-bottom:1px solid rgba(196,162,101,0.08);}
+.cmp-tbl td{text-align:right;font-size:13px;color:var(--ivory);padding:11px 14px;
+  border-bottom:1px solid rgba(196,162,101,0.08);border-left:1px solid rgba(196,162,101,0.08);}
+.cmp-tbl tbody tr:last-child th,.cmp-tbl tbody tr:last-child td{border-bottom:0;}
+.cmp-tbl .cv.win{color:var(--champ-hi);font-weight:600;background:rgba(196,162,101,0.06);}
+.cmp-note{font-size:11.5px;color:var(--smoke);line-height:1.6;margin-top:12px;}
+@media (max-width:560px){
+  .cmp-tbl thead th,.cmp-tbl tbody th{font-size:11.5px;padding:9px 9px;}
+  .cmp-tbl td{font-size:12px;padding:9px 9px;}
+  .cmp-tbl thead th:first-child{width:32%;}
+}
+
+/* ─────────── 20. Print — the model as a document ───────────
+   The visitor's own figures, on paper, carrying the link that reproduces
+   them. Everything that is navigation or decoration is dropped. */
+#print-head{display:none;}
+@media print{
+  @page{margin:16mm 14mm;}
+  html,body{background:#fff!important;color:#111!important;font-size:11pt;}
+  #nav,#wa,#progress,#loader,#cur-dot,#cur-ring,footer,.skip,.marquee,
+  .share-bar,.tool-tabs,.tt,.cmp-bar,#dust,#skyline,.hero-glow,.scroll-cue{display:none!important;}
+  .tool-panel:not(.on){display:none!important;}
+  main,section,.wrap{padding:0!important;margin:0!important;max-width:none!important;}
+  section{border:0!important;background:#fff!important;}
+  #print-head{display:block;margin-bottom:14mm;padding-bottom:5mm;border-bottom:1.5pt solid #C4A265;}
+  #print-head .ph-brand{font-size:10pt;letter-spacing:2.4pt;font-weight:700;color:#111;}
+  #print-head .ph-brand span{font-weight:400;letter-spacing:.6pt;color:#555;}
+  #print-head .ph-t{font-family:'Cormorant Garamond',serif;font-size:24pt;color:#111;margin:5mm 0 2mm;}
+  #print-head .ph-m{font-size:8.5pt;color:#444;}
+  #print-head .ph-m b{color:#111;font-weight:600;word-break:break-all;}
+  #print-head .ph-d{font-size:7.5pt;color:#666;margin-top:3mm;line-height:1.45;max-width:150mm;}
+  /* the dark theme inverted for ink */
+  .tool-panel,.tf,.fld,.lab-out,.lab-card,.cmp-tbl{background:#fff!important;color:#111!important;
+    border-color:#ccc!important;box-shadow:none!important;}
+  .tool-panel *,.cmp-tbl *{color:#111!important;text-shadow:none!important;}
+  input,select,textarea{background:#fff!important;color:#111!important;border:1pt solid #bbb!important;}
+  .rv{opacity:1!important;transform:none!important;}
+  a[href]{text-decoration:none;color:#111!important;}
+  .tool-note,.updated,.cmp-note{color:#555!important;font-size:8pt;}
+  h1,h2,h3{color:#111!important;page-break-after:avoid;}
+  table,.lab-card{page-break-inside:avoid;}
+}

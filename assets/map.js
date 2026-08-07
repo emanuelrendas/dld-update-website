@@ -209,4 +209,77 @@ document.querySelectorAll('.gate-b').forEach(b=>{
 paintMap();
 selectArea('palm');
 
+
+/* ═══════════════ COMPARE TWO COMMUNITIES ═══════════════
+   Reads the same AREAS record the panel does, so a figure can never
+   disagree between the two views. Directional winners are marked only
+   where "better" is unambiguous — price per sqft and entry band are
+   left neutral, because cheaper is not better, it is different. */
+const CMP_ROWS = [
+  {k:'Price / sqft',      v:a=>'AED '+a.psf.toLocaleString(), dir:0},
+  {k:'Gross yield',       v:a=>a.yl.toFixed(1)+'%',           dir:1, n:a=>a.yl},
+  {k:'Net yield',         v:a=>a.net_n.toFixed(2)+'%',        dir:1, n:a=>a.net_n},
+  {k:'Service charge',    v:a=>'AED '+a.sc+' / sqft',         dir:-1, n:a=>a.sc},
+  {k:'Supply absorption', v:a=>a.ab.toFixed(2)+'×',           dir:-1, n:a=>a.ab},
+  {k:'Liquidity depth',   v:a=>a.liq,                          dir:0},
+  {k:'Growth outlook',    v:a=>LAYERS.growth.fmt(a),           dir:1, n:a=>a.gr},
+  {k:'Supply risk',       v:a=>LAYERS.risk.fmt(a),             dir:-1, n:a=>a.rk},
+  {k:'Capital preservation', v:a=>a.pres+' / 5',               dir:1, n:a=>a.pres},
+  {k:'Entry band',        v:a=>a.b,                            dir:0},
+  {k:'Return profile',    v:a=>a.r,                            dir:0},
+];
+
+function renderCompare(){
+  const box = document.getElementById('cmp-out');
+  const sel = document.getElementById('cmp-sel');
+  if(!box || !sel) return;
+  const other = sel.value;
+  if(!other || other === activeArea){ box.innerHTML = ''; box.hidden = true; return; }
+  const A = AREAS[activeArea], B = AREAS[other];
+  if(!A || !B) return;
+
+  const rows = CMP_ROWS.map(r=>{
+    let aw='', bw='';
+    if(r.dir && r.n){
+      const na=r.n(A), nb=r.n(B);
+      if(na !== nb){ const aBetter = r.dir > 0 ? na > nb : na < nb; aw = aBetter?' win':''; bw = aBetter?'':' win'; }
+    }
+    return `<tr><th>${r.k}</th><td class="cv${aw}">${r.v(A)}</td><td class="cv${bw}">${r.v(B)}</td></tr>`;
+  }).join('');
+
+  box.innerHTML =
+    `<table class="cmp-tbl"><thead><tr><th></th><th>${A.n}</th><th>${B.n}</th></tr></thead><tbody>${rows}</tbody></table>
+     <p class="cmp-note">Figures are indicative and modelled from registered transactions; the method is stated beside each metric in the panel above. A highlight marks the stronger side only where the direction is unambiguous — price and entry band carry none, because cheaper is not better, it is different.</p>`;
+  box.hidden = false;
+}
+
+/* rebuild the option list whenever the primary selection moves */
+function syncCompareOptions(){
+  const sel = document.getElementById('cmp-sel');
+  if(!sel) return;
+  const keep = sel.value;
+  sel.innerHTML = '<option value="">Compare with…</option>' +
+    Object.entries(AREAS).filter(([k])=> k !== activeArea)
+      .map(([k,a])=> `<option value="${k}"${k===keep?' selected':''}>${a.n}</option>`).join('');
+}
+
+(function mountCompare(){
+  const panel = document.getElementById('mp-name')?.closest('div[class]')?.parentElement
+             || document.getElementById('map')?.querySelector('.wrap');
+  if(!panel) return;
+  const bar = document.createElement('div');
+  bar.className = 'cmp-bar';
+  bar.innerHTML =
+    `<label class="cmp-l" for="cmp-sel">Side by side</label>
+     <select id="cmp-sel" aria-label="Compare the selected community with another"></select>
+     <div class="cmp-out" id="cmp-out" hidden></div>`;
+  panel.appendChild(bar);
+  syncCompareOptions();
+  document.getElementById('cmp-sel').addEventListener('change', renderCompare);
+
+  /* wrap the existing selector so both views always move together */
+  const inner = selectArea;
+  selectArea = function(key){ inner(key); syncCompareOptions(); renderCompare(); };
+})();
+
 })();

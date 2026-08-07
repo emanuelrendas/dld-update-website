@@ -81,6 +81,7 @@
     <p class="sb-d">Your figures live in the link. Send it to whoever else needs to see the numbers — it reopens exactly as you left it. Nothing is stored on this website.</p>
     <div class="sb-act">
       <button type="button" class="btn btn-solid" id="sb-copy">Copy the link</button>
+      <button type="button" class="btn btn-line" id="sb-pdf">Save as PDF</button>
       <a class="btn btn-line" id="sb-wa" target="_blank" rel="noopener noreferrer">Send it to Emanuel</a>
     </div>
     <output class="sb-msg" id="sb-msg" aria-live="polite"></output>`;
@@ -115,6 +116,39 @@
   bar.addEventListener('mouseenter', refreshWA);
   wa.addEventListener('click', refreshWA);
   ALL.forEach(id => document.getElementById(id)?.addEventListener('input', refreshWA));
+
+
+  /* ---- PDF via the browser's own print pipeline ----
+     No library, no server round-trip, and the output carries whatever the
+     visitor actually configured. A print-only header states the source,
+     the date and the link that reproduces the model, so the page is
+     self-describing once it leaves the browser. */
+  const pdfBtn = bar.querySelector('#sb-pdf');
+  if (pdfBtn) {
+    const stamp = () => {
+      let h = document.getElementById('print-head');
+      if (!h) {
+        h = document.createElement('div');
+        h.id = 'print-head';
+        document.body.insertBefore(h, document.body.firstChild);
+      }
+      const panel = document.querySelector('.tt.on')?.textContent.trim() || 'Investment Lab';
+      h.innerHTML =
+        `<div class="ph-brand">EMANUEL RENDAS <span>· Private Real Estate Advisory, Dubai</span></div>
+         <div class="ph-t">${panel}</div>
+         <div class="ph-m">Modelled ${new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
+           · reproduce at <b>${shareURL()}</b></div>
+         <div class="ph-d">Illustrative, not a forecast, a guarantee, or financial, tax or legal advice.
+           Property values can fall. LTV options follow UAE Central Bank caps. Independent advice should be
+           taken before any purchase.</div>`;
+    };
+    pdfBtn.addEventListener('click', () => {
+      stamp();
+      /* let the header paint before the print dialog freezes the document */
+      requestAnimationFrame(() => requestAnimationFrame(() => window.print()));
+    });
+    window.addEventListener('beforeprint', stamp);
+  }
 
   /* restore last, so the engines are already wired when values land */
   if (restore()) {

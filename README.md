@@ -106,3 +106,24 @@ listen for, so no calculator needs to know the module exists — adding a new
 field means adding its id to the `PANELS` map and nothing else.
 
 A clean visit leaves the address bar bare and the defaults untouched.
+
+## Community comparison
+
+The side-by-side table on `/addresses` lives at the end of `assets/map.js`,
+inside the same closure as `AREAS`, so a figure cannot disagree between the
+panel and the comparison. `selectArea` is wrapped rather than duplicated, so
+moving the primary pin refreshes both views and drops the active community
+from the option list.
+
+Directional winners are highlighted only where "better" is unambiguous.
+Price per sqft and entry band carry no highlight by design — cheaper is not
+better, it is different.
+
+## PDF export
+
+`Save as PDF` on `/instruments` uses the browser's own print pipeline — no
+library, no server round-trip — so the output carries whatever the visitor
+actually configured. A print-only header (`#print-head`, injected on demand)
+states the panel, the date, the link that reproduces the model, and the
+disclaimer. Section 20 of `site.css` drops navigation and decoration and
+inverts the dark theme for ink.
