@@ -902,3 +902,20 @@ footer{view-transition-name:site-footer;}
   .philo-g{grid-template-columns:1fr;}
   .philo-c h3{min-height:0;}
 }
+
+/* ─────────── 18. Shareable model bar (/instruments) ─────────── */
+.share-bar{margin-top:40px;border:1px solid var(--champ-dim);background:rgba(196,162,101,0.04);
+  padding:30px 32px;display:flex;flex-direction:column;gap:14px;align-items:flex-start;}
+.share-bar .sb-t{font-family:'Cormorant Garamond',serif;font-size:25px;color:var(--champ-hi);line-height:1;}
+.share-bar .sb-d{font-size:14.5px;color:var(--smoke);max-width:640px;line-height:1.6;}
+.share-bar .sb-act{display:flex;gap:12px;flex-wrap:wrap;margin-top:4px;}
+.share-bar .sb-msg{font-size:12px;letter-spacing:1.6px;text-transform:uppercase;
+  color:var(--champ-hi);min-height:18px;display:block;width:100%;}
+.share-bar .sb-fallback{width:100%;background:var(--void);border:1px solid var(--champ-dim);
+  color:var(--ivory);padding:10px 12px;font-size:12.5px;font-family:'Inter',sans-serif;
+  text-transform:none;letter-spacing:0;}
+@media (max-width:700px){
+  .share-bar{padding:24px 20px;}
+  .share-bar .sb-act{width:100%;}
+  .share-bar .sb-act .btn{flex:1;justify-content:center;min-width:100%;}
+}

@@ -95,3 +95,14 @@ agents.
 Changing the public domain is a single edit: the `SITE` constant at the top
 of the build script feeds every canonical, Open Graph tag, JSON-LD URL,
 sitemap entry and llms.txt link.
+
+## Shareable models
+
+`assets/share.js` (loaded on `/instruments` only) keeps the state of every
+calculator in the URL. Only fields the visitor changed from the shipped
+defaults are serialised, so the link stays short enough to paste into
+WhatsApp. Restoring dispatches the same `input` event the engines already
+listen for, so no calculator needs to know the module exists — adding a new
+field means adding its id to the `PANELS` map and nothing else.
+
+A clean visit leaves the address bar bare and the defaults untouched.
