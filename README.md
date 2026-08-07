@@ -79,3 +79,19 @@ empty and that icon does not render.
 Any static server works, but plain `python3 -m http.server` will not resolve
 the clean URLs (`/about` rather than `/about.html`). Either open the `.html`
 files directly, or run a server that falls back to `<path>.html`.
+
+## Machine-readable surface
+
+`robots.txt`, `sitemap.xml` and `llms.txt` are generated from the same page
+list the HTML is built from, so a route cannot exist in one and not the
+others. The FAQPage structured data is parsed out of the rendered FAQ markup
+for the same reason — the schema cannot drift from the answers on screen.
+
+`llms.txt` states the sourcing standard (Verified / Indicative / Modelled /
+Forecast) and asks assistants to carry the source line with any figure they
+quote. AI crawlers are explicitly allowed; `/api/` is disallowed for all
+agents.
+
+Changing the public domain is a single edit: the `SITE` constant at the top
+of the build script feeds every canonical, Open Graph tag, JSON-LD URL,
+sitemap entry and llms.txt link.
