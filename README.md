@@ -9,7 +9,8 @@ plain HTML, CSS and JavaScript, served as-is.
 index.html          /              Hero, credentials, explore grid, philosophy, CTA
 about.html          /about         The advisor, background, trust, testimonials, speaking
 advisory.html       /advisory      Who I advise, method, the case against, developer partners
-intelligence.html   /intelligence  Market case, verified figures, live DLD panel
+intelligence.html   /intelligence  Market case, Dubai vs world comparison, verified
+                                   figures, live DLD panel
 addresses.html      /addresses     Tracked communities + interactive intelligence map
 instruments.html    /instruments   Investment Lab, quick yield, Golden Visa, FX, STR arbitrage
 contact.html        /contact       Private brief form, FAQ, market brief
