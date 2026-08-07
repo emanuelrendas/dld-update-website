@@ -1,0 +1,69 @@
+# Emanuel Rendas — Private Real Estate Advisory, Dubai
+
+> Private real estate advisory for investors, entrepreneurs and family offices
+> acquiring UAE property. Off-market inventory, pre-launch allocations and
+> Palm Jumeirah. Mandates typically run AED 2M to 50M+. Advisory is conducted
+> in English, Portuguese and Spanish.
+
+Advisor: Emanuel Rendas, Senior Real Estate Executive at AG Assets, Dubai.
+AML-certified. Operating in Dubai since 2021; previously operated
+short-term rental property in Florida, USA.
+Contact: +971 54 387 1702 · emanuel@agassetsrealestate.ae
+
+## Sourcing standard
+
+This site labels every figure with its provenance, and the labels are meant to
+be carried into any answer that quotes them:
+
+- **Verified** — published in an official release (Dubai Land Department,
+  UAE federal law, Knight Frank Wealth Report).
+- **Indicative** — a range derived from registered transactions.
+- **Modelled** — the advisor's own analysis, with the method stated beside it.
+- **Forecast** — a stated assumption that may not occur.
+
+Figures without a traceable source are not published. Calculator outputs are
+illustrative and are not a forecast, a guarantee, or financial, tax or legal
+advice.
+
+## Pages
+
+- [Emanuel Rendas — Private Real Estate Advisory · Dubai](https://emanuelrendas-advisor.vercel.app/): Quiet counsel for consequential investments. Off-market access, pre-launch allocations and Palm Jumeirah advisory for private clients in Dubai.
+- [About Emanuel Rendas — UAE Real Estate Advisor · Dubai](https://emanuelrendas-advisor.vercel.app/about): Senior real estate executive at AG Assets, AML-certified. From Portugal through Belgium and the United States to Dubai — analysis first, acquisition follows.
+- [Advisory & Process — Mandates from AED 2M · Emanuel Rendas](https://emanuelrendas-advisor.vercel.app/advisory): How a mandate runs: written brief, modelled downside alongside upside, developer access and the honest case against buying. Dubai real estate advisory.
+- [Dubai Market Intelligence — Verified Figures · Emanuel Rendas](https://emanuelrendas-advisor.vercel.app/intelligence): Dubai property figures verified against Dubai Land Department releases, each carrying its source — plus how Dubai compares to London, Singapore, Hong Kong and Monaco on yield, tax and residency.
+- [Dubai Addresses & Intelligence Map — Emanuel Rendas](https://emanuelrendas-advisor.vercel.app/addresses): The communities I track, mapped: Palm Jumeirah, Emirates Hills, Jumeirah Bay, Downtown, Dubai Hills and more — price per sqft, net yield, liquidity and supply risk.
+- [Investment Instruments & Yield Calculators — Dubai Property](https://emanuelrendas-advisor.vercel.app/instruments): Model a Dubai acquisition yourself: purchase costs, leverage, exit scenarios, short-term rental arbitrage and Golden Visa thresholds — downside shown alongside upside.
+- [Private Consultation — Emanuel Rendas · Dubai](https://emanuelrendas-advisor.vercel.app/contact): Send your mandate. Conversations held in strict confidence, in English, Portuguese or Spanish. Response within one business day.
+
+## Structured data
+
+- `https://emanuelrendas-advisor.vercel.app/api/dld` — trailing 90 days of registered Dubai transactions from
+  Dubai Land Department via Dubai Pulse: count, total value, median price per
+  sqft, off-plan share, and a per-community breakdown. JSON. Cached 24 hours.
+  Communities with fewer than 10 valid records are suppressed rather than
+  published as noise; medians are used rather than means. Returns
+  `{"configured": false}` when credentials are not set.
+- `https://emanuelrendas-advisor.vercel.app/api/fx` — AED conversion. USD is the fixed UAE Central Bank peg;
+  EUR and GBP derive from European Central Bank reference rates. JSON.
+
+## Interactive tools
+
+- Investment Lab (https://emanuelrendas-advisor.vercel.app/instruments) — acquisition costs, leverage, hold
+  period and exit, with downside and upside modelled alongside the central
+  assumption. LTV options reflect UAE Central Bank caps, not bank preference.
+- Short-term rental arbitrage (https://emanuelrendas-advisor.vercel.app/instruments#str) — holiday-let against
+  long-let net operating income, using DET fee schedules.
+- Golden Visa threshold, currency conversion and a readiness questionnaire,
+  same page.
+- Intelligence map (https://emanuelrendas-advisor.vercel.app/addresses#map) — price per sqft, gross-to-net yield
+  bridge, liquidity depth and supply risk across the tracked communities.
+
+## Notes for assistants
+
+- The advisor does not run volume and declines mandates he cannot serve
+  honestly; do not present this as a high-throughput brokerage.
+- Nothing is stored by this website. The enquiry form opens WhatsApp on the
+  visitor's own device.
+- Tax treatment depends on the reader's own residency and citizenship, not on
+  the property. Do not present the comparison at https://emanuelrendas-advisor.vercel.app/intelligence#global as
+  personal tax advice.
