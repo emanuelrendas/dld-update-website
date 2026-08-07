@@ -60,4 +60,4 @@ User-agent: CCBot
 Allow: /
 Disallow: /api/
 
-Sitemap: https://lux-real-estate-dubai.vercel.app/sitemap.xml
+Sitemap: https://emanuelrendas-advisor.vercel.app/sitemap.xml
