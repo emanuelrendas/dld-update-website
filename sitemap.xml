@@ -1,37 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://emanuelrendas-advisor.vercel.app/</loc>
+    <loc>https://professional-website-real-estate.vercel.app/</loc>
     <changefreq>monthly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://emanuelrendas-advisor.vercel.app/about</loc>
+    <loc>https://professional-website-real-estate.vercel.app/about</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://emanuelrendas-advisor.vercel.app/advisory</loc>
+    <loc>https://professional-website-real-estate.vercel.app/advisory</loc>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://emanuelrendas-advisor.vercel.app/intelligence</loc>
+    <loc>https://professional-website-real-estate.vercel.app/intelligence</loc>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://emanuelrendas-advisor.vercel.app/addresses</loc>
+    <loc>https://professional-website-real-estate.vercel.app/addresses</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://emanuelrendas-advisor.vercel.app/instruments</loc>
+    <loc>https://professional-website-real-estate.vercel.app/instruments</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://emanuelrendas-advisor.vercel.app/contact</loc>
+    <loc>https://professional-website-real-estate.vercel.app/contact</loc>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
