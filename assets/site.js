@@ -135,6 +135,7 @@ if(!noHover && !reduced){
 
 /* ═══════════════ NAV + PROGRESS ═══════════════ */
 const nav = document.getElementById('nav');
+const hasHero = !!document.querySelector('.hero');
 const navToggle = document.getElementById('nav-tg');
 const navLinks = document.getElementById('nav-links');
 (function(){
@@ -144,7 +145,11 @@ const navLinks = document.getElementById('nav-links');
     if(ticking) return;
     ticking = true;
     requestAnimationFrame(()=>{
-      nav?.classList.toggle('solid', scrollY > 70);
+      /* Only the home page has a hero to sit behind a transparent bar. On
+         every other route the content begins directly under the nav, so a
+         see-through bar lets headings slide under it during the first 70px
+         of scroll. Those pages stay solid throughout. */
+      nav?.classList.toggle('solid', hasHero ? scrollY > 70 : true);
       if(progress){
         const h = document.documentElement.scrollHeight - innerHeight;
         progress.style.width = (h > 0 ? scrollY/h*100 : 0) + '%';
