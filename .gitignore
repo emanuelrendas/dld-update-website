@@ -1,0 +1,15 @@
+# Raw government datasets stay local. They are large, they contain
+# transaction-level records, and nothing in the site reads them directly —
+# only the small aggregated snapshots derived from them are committed.
+data/raw/*
+!data/raw/.gitkeep
+data/manifest.json
+
+# no spreadsheet or archive is ever committed
+*.csv
+*.xlsx
+*.xls
+*.zip
+
+node_modules/
+.DS_Store
