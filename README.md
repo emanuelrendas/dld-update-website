@@ -119,6 +119,61 @@ Directional winners are highlighted only where "better" is unambiguous.
 Price per sqft and entry band carry no highlight by design — cheaper is not
 better, it is different.
 
+## Dataset tooling
+
+`tools/` is local-only. Nothing under it runs in production, is bundled, or
+is reachable from a page — the site has no build step and does not import
+from it.
+
+```
+tools/inspect-datasets.mjs   reports the structure of local DLD exports
+tools/ingest.mjs             a deliberate no-op that freezes the output contract
+```
+
+**The inspector reads; it never writes to a dataset, moves one, or sends one
+anywhere.** Point it at a folder and it walks it, identifies each file by its
+leading bytes rather than its extension, and streams whatever it recognises:
+
+| Detected | Handling |
+|---|---|
+| `json`  | Finds the key holding the records — CKAN wraps them in `result.records` next to a `fields` catalogue that would otherwise be counted as a row — and emits one record at a time |
+| `jsonl` | One object per line |
+| `xlsx`  | Inflated straight out of its ZIP container; shared strings resolved, and date-formatted numbers converted using `styles.xml` rather than left as serials |
+| delimited | A quote-aware state machine, not `split(',')` |
+
+Everything else — PDFs, installers, legacy `.xls`, ordinary text — is counted
+by type and skipped. Files that parse but whose names do not look like land-
+registry exports are listed rather than silently ignored, so a differently
+named export is visible; `--all` includes them.
+
+Split exports (`…_0001`, `…_0002`, `… (1)`) feed one accumulator, so the row
+count, date span and duplicate count describe the dataset rather than a slice
+of it. A trailing **year** is not treated as a part index — `rent_contracts_2025`
+and `_2026` stay separate, because merging two periods silently would hide the
+difference. If the parts' column signatures disagree, that is reported, loudly.
+
+Memory is bounded by design, not by luck: 277MB / 1.2M JSON records inspects in
+14s at 266MB peak; a 400,000-row XLSX in 4.5s at 115MB.
+
+### What it will not print
+
+Structure, never content. Column names, inferred types, completeness, ranges
+and cardinality — plus value counts only where a column is a small enumeration
+(`Off-Plan Properties`, `Villa`), which is what makes the output useful for
+mapping fields to metrics.
+
+Any column whose name suggests it identifies a person — buyer, seller, tenant,
+owner, passport, Emirates ID, phone, email, nationality — is reported as
+present with its completeness and nothing else. No values, no categories, no
+samples, at any cardinality.
+
+```
+node tools/inspect-datasets.mjs --dir "C:\Users\…\Downloads"
+```
+
+Output goes to the terminal, to `data/inspection-report.txt` and to
+`data/manifest.json`. All three are gitignored, as are the datasets themselves.
+
 ## PDF export
 
 `Save as PDF` on `/instruments` uses the browser's own print pipeline — no

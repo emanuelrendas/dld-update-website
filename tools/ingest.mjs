@@ -2,7 +2,7 @@
 /* ═══════════════════════════════════════════════════════════════════════
    INGESTION — not implemented yet, deliberately.
 
-   The field mapping cannot be written until the DATASET_MANIFEST from
+   The field mapping cannot be written until the manifest from
    inspect-datasets.mjs says what the columns actually are. Guessing them
    would produce a pipeline that runs, returns numbers, and is wrong in a
    way nobody notices for months.
@@ -20,7 +20,7 @@
      "manifest": {
        "source":       "Dubai Land Department",       // publisher
        "dataset":      "<data.dubai dataset id>",     // exact provenance
-       "via":          "csv" | "api",                 // how it was read
+       "via":          "json" | "xlsx" | "csv" | "api",  // how it was read
        "published":    "2026-08-01",                  // dataset's own date
        "verified":     "2026-08-08",                  // when we ingested
        "confidence":   "verified",                    // verified|indicative|modelled|forecast
@@ -61,8 +61,10 @@ Run the inspector first:
 
   node tools/inspect-datasets.mjs
 
-It writes ${manifest} describing the CSVs in data/raw. The field mapping
-is written against that manifest, not guessed.`);
+Point --dir at wherever the exports actually are; it detects JSON, JSONL,
+XLSX and delimited text by content. It writes ${manifest} describing what
+the columns are. The field mapping is written against that manifest, not
+guessed.`);
   process.exit(1);
 }
 

@@ -3,13 +3,31 @@
 # only the small aggregated snapshots derived from them are committed.
 data/raw/*
 !data/raw/.gitkeep
-data/manifest.json
 
-# no spreadsheet or archive is ever committed
+# Inspector output. Structure only, but it is a working note, not a
+# deliverable, and it is regenerated on every run.
+data/manifest.json
+data/inspection-report.txt
+
+# No spreadsheet or archive is ever committed.
 *.csv
 *.xlsx
 *.xls
 *.zip
+*.jsonl
+
+# Portal exports also arrive as .json, which cannot be ignored wholesale
+# (vercel.json lives at the root). These are the names Data.Dubai uses, so
+# a copy dropped anywhere in the tree — not just in data/raw — is caught.
+*transaction*.json
+*rent_contract*.json
+*contract*.json
+*valuation*.json
+*building*.json
+*broker*.json
+*dld*.json
+*dubai_*.json
+Downloads/
 
 node_modules/
 .DS_Store
