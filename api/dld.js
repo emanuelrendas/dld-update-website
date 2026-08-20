@@ -114,6 +114,8 @@ export default async function handler(req, res) {
   // Cache at Vercel's edge for 24 hours. Dubai Pulse states the source
   // updates daily, so a 24h cache matches the publication cadence exactly.
   res.setHeader('Cache-Control', 's-maxage=86400, stale-while-revalidate=172800');
+  // Ensure the response is identified as JSON for local tooling and tests.
+  res.setHeader('Content-Type', 'application/json');
 
   if (!KEY || !SECRET) {
     return res.status(200).json({

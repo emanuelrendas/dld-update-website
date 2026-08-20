@@ -1,0 +1,1 @@
+/* README: patch applied by Copilot — no runtime content */
