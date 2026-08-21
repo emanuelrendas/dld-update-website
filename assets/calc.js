@@ -27,6 +27,42 @@ const AEDk = n => Math.abs(n) >= 1e6
 const F = window.Finance;
 const val = (id, d = 0) => { const el = document.getElementById(id); return el ? (+el.value || d) : d; };
 
+/* ─────────── engagement, not keystrokes ───────────
+   Every panel recalculates on each `input` event, so tracking there would
+   post an event per character typed. This fires once per tool, four
+   seconds after the visitor stops changing things — the point at which
+   they have a model rather than a half-typed number.
+
+   What travels is the SHAPE of the model: a budget band, whether leverage
+   was used, the hold period. Never the price, never the rent, never the
+   figures themselves. Knowing someone modelled an eight-figure purchase is
+   useful; storing their exact numbers is surveillance, and they came here
+   to do arithmetic in private. */
+const bandOf = (price) =>
+  !price          ? null :
+  price <  2e6    ? 'under AED 2M'  :
+  price <  5e6    ? 'AED 2M – 5M'   :
+  price < 15e6    ? 'AED 5M – 15M'  :
+  price < 50e6    ? 'AED 15M – 50M' : 'AED 50M+';
+
+/* Armed on the input listeners rather than inside the render functions:
+   every panel renders once on load to show its defaults, so tracking the
+   render would report "calculator used" for anyone who merely opened the
+   page — turning the one signal that identifies a high-intent visitor into
+   a second, worse pageview count. */
+function armTracking(ids, tool, props){
+  let sent = false, timer = null;
+  const bump = ()=>{
+    if(sent || !window.Track) return;
+    clearTimeout(timer);
+    timer = setTimeout(()=>{ sent = true; window.Track('calculator_used', Object.assign({ tool }, props())); }, 4000);
+  };
+  ids.forEach(id=>{
+    const el = document.getElementById(id);
+    if(el){ el.addEventListener('input', bump); el.addEventListener('change', bump); }
+  });
+}
+
 /* Reads the Lab's inputs into the shape the shared engine expects. */
 function labInputs(appreciation){
   return {
@@ -105,6 +141,12 @@ function runLab(){
 }
 ['L-price','L-rent','L-sc','L-mgmt','L-vac','L-maint','L-ltv','L-rate','L-term','L-exit','L-app','L-other']
   .forEach(id=>{ const el=document.getElementById(id); if(el) el.addEventListener('input', runLab); });
+
+armTracking(['L-price','L-rent','L-sc','L-mgmt','L-vac','L-maint','L-ltv','L-rate','L-term','L-exit','L-app','L-other'], 'investment_lab', ()=>({
+  budget_band:   bandOf(val('L-price')),
+  used_leverage: val('L-ltv') > 0,
+  hold_years:    val('L-exit', 5),
+}));
 runLab();
 
 /* ═══════════════ STR / LONG-TERM NOI ENGINE ═══════════════
@@ -270,6 +312,9 @@ function calcROI(){
   document.getElementById('r-total').textContent   = (total>=0?'+':'')+total.toFixed(1)+'%';
 }
 ['r-price','r-rent','r-sc','r-app'].forEach(id=> document.getElementById(id).addEventListener('input', calcROI));
+armTracking(['r-price','r-rent','r-sc','r-app'], 'quick_roi', ()=>({
+  budget_band: bandOf(val('r-price')), used_leverage: false,
+}));
 calcROI();
 
 /* ═══════════════ TOOLS — Golden Visa ═══════════════ */

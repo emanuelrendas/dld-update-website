@@ -380,6 +380,12 @@ section{padding:96px 0;position:relative;}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
 @media(max-width:560px){.two{grid-template-columns:1fr;}}
 .cf-note{font-size:11px;color:var(--smoke);margin-top:18px;line-height:1.6;}
+/* Confirmation that the brief was actually stored. Silence after a submit
+   reads as failure, and this form is the one place on the site where a
+   visitor has handed over something they cannot get back. */
+.cf-stored{font-size:12.5px;line-height:1.6;margin-top:14px;padding:11px 14px;
+  border-left:2px solid var(--champagne);background:rgba(196,164,106,.07);color:var(--ivory);}
+.cf-stored.warn{border-left-color:#C2564E;background:rgba(194,86,78,.09);}
 @media(max-width:920px){.cons-g{grid-template-columns:1fr;gap:48px;}.cons-form{padding:34px 26px;}}
 
 /* ═══════════════ FOOTER ═══════════════ */

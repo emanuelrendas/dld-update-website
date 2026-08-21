@@ -152,11 +152,12 @@
       </div>
       <form class="cons-form rv rv-d1" id="brief-form">
         <div class="cf-t">Private Investment Brief</div>
-        <div class="cf-s">Five questions. Ninety seconds. Opens directly in WhatsApp — nothing is stored on this website.</div>
+        <div class="cf-s">Six questions. Ninety seconds. Your brief is held in confidence and opens directly in WhatsApp.</div>
         <div class="two">
-          <div class="fld"><label for="b-name">Name</label><input id="b-name" type="text" placeholder="Your name" required></div>
-          <div class="fld"><label for="b-base">Where are you based?</label><input id="b-base" type="text" placeholder="City, country"></div>
+          <div class="fld"><label for="b-name">Name</label><input id="b-name" type="text" placeholder="Your name" autocomplete="name" required></div>
+          <div class="fld"><label for="b-email">Email</label><input id="b-email" type="email" placeholder="you@example.com" autocomplete="email" required></div>
         </div>
+        <div class="fld"><label for="b-base">Where are you based?</label><input id="b-base" type="text" placeholder="City, country" autocomplete="address-level2"></div>
         <div class="two">
           <div class="fld"><label for="b-int">Investment objective</label>
             <select id="b-int"><option>Capital preservation</option><option>Rental income allocation</option><option>Capital appreciation</option><option>Portfolio construction</option><option>Golden Visa residency</option><option>Off-market / pre-launch access</option></select></div>
@@ -166,6 +167,7 @@
         <div class="fld"><label for="b-msg">Your mandate</label><textarea id="b-msg" placeholder="What is this capital being asked to do — and over what horizon?"></textarea></div>
         <button type="submit" class="btn btn-solid magnetic" style="width:100%;justify-content:center;">Speak with Emanuel</button>
         <p class="cf-note">Conversations are held in strict confidence, always.</p>
+        <p class="cf-stored" id="brief-stored" role="status" aria-live="polite" hidden></p>
         <div class="brief-fb" id="brief-fallback" hidden>
           <p>WhatsApp should have opened in a new tab. If it did not — pop-ups blocked, or no WhatsApp on this device — your brief is not lost:</p>
           <div class="fb-act">
@@ -260,7 +262,7 @@
       <div class="legal-g">
         <div class="legal-c">
           <div class="lt">Privacy</div>
-          <p>This website stores nothing. There is no database, no tracking pixel, no cookie, no mailing list. The brief form opens WhatsApp on your own device with a message you can read and edit before sending. Nothing reaches me until you press send.</p>
+          <p>Your brief is stored so that I can reply to it — your name, your email and what you write, held privately and reachable only by me. It is never sold, never shared, and never added to a mailing list unless you ask for one. Anonymous page statistics record which pages are read; they are not tied to you and set no advertising cookie. The form also opens WhatsApp on your own device with a message you can read and edit before sending. Ask at any time and your record is deleted.</p>
         </div>
         <div class="legal-c">
           <div class="lt">Confidentiality</div>
