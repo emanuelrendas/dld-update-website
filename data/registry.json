@@ -1,0 +1,264 @@
+{
+  "$comment": [
+    "SOURCE REGISTRY — the single place a published market figure may live.",
+    "",
+    "Every entry carries who published it, what period it measures, when they",
+    "published, and when we last verified. Those are four different facts and",
+    "the schema refuses to let them collapse into one.",
+    "",
+    "classification is one of:",
+    "  OFFICIAL · PRIMARY    Dubai Land Department / Dubai Pulse",
+    "  OFFICIAL · AUTHORITY  CBUAE, ADREC, UAE Government, Dubai Government",
+    "  THIRD-PARTY           named private research, dated",
+    "  MODELLED              our own calculation, methodology mandatory",
+    "  USER INPUT            calculator output, never stored here",
+    "",
+    "The bare word 'Official' is not a valid classification and never appears.",
+    "",
+    "'published' is month-granular where the exact release day is not known.",
+    "Inventing a day to look precise is the failure this registry exists to",
+    "prevent."
+  ],
+
+  "policy": {
+    "staleAfterDays": { "month": 45, "quarter": 120, "half": 210, "year": 400, "static": 365 },
+    "reverifyAfterDays": 30,
+    "referenceDate": "2026-08-08"
+  },
+
+  "metrics": [
+    {
+      "id": "dubai.sales.value.2026H1",
+      "name": "Dubai sales value",
+      "value": 286430000000, "unit": "AED",
+      "period": { "type": "half", "id": "2026-H1", "from": "2026-01-01", "to": "2026-06-30", "complete": true },
+      "published": "2026-07", "verifiedAt": "2026-08-08",
+      "emirate": "Dubai", "authority": "Dubai Land Department",
+      "source": "Dubai Land Department — H1 2026 sales release",
+      "dataset": "DLD H1 2026 release", "classification": "OFFICIAL · PRIMARY",
+      "methodology": null, "url": null,
+      "note": "Sales only. Excludes mortgages and gifts, which is why this is lower than all-registration totals."
+    },
+    {
+      "id": "dubai.sales.count.2026H1",
+      "name": "Dubai sales transactions",
+      "value": 86005, "unit": "transactions",
+      "period": { "type": "half", "id": "2026-H1", "from": "2026-01-01", "to": "2026-06-30", "complete": true },
+      "published": "2026-07", "verifiedAt": "2026-08-08",
+      "emirate": "Dubai", "authority": "Dubai Land Department",
+      "source": "Dubai Land Department — H1 2026 sales release",
+      "dataset": "DLD H1 2026 release", "classification": "OFFICIAL · PRIMARY",
+      "methodology": null, "url": null
+    },
+    {
+      "id": "dubai.sales.value.2025H1",
+      "name": "Dubai sales value, prior year",
+      "value": 326600000000, "unit": "AED",
+      "period": { "type": "half", "id": "2025-H1", "from": "2025-01-01", "to": "2025-06-30", "complete": true },
+      "published": "2025-07", "verifiedAt": "2026-08-08",
+      "emirate": "Dubai", "authority": "Dubai Land Department",
+      "source": "Dubai Land Department — H1 2025 sales release",
+      "dataset": "DLD H1 2025 release", "classification": "OFFICIAL · PRIMARY",
+      "methodology": null, "url": null, "historical": true,
+      "note": "Prior-year comparator, deliberately historical. Not a current figure and not treated as one."
+    },
+    {
+      "id": "dubai.offplan.value.2026H1",
+      "name": "Dubai off-plan sales value",
+      "value": 139750000000, "unit": "AED",
+      "period": { "type": "half", "id": "2026-H1", "from": "2026-01-01", "to": "2026-06-30", "complete": true },
+      "published": "2026-07", "verifiedAt": "2026-08-08",
+      "emirate": "Dubai", "authority": "Dubai Land Department",
+      "source": "Dubai Land Department — off-plan segment, H1 2026",
+      "dataset": "DLD H1 2026 release", "classification": "OFFICIAL · PRIMARY",
+      "methodology": null, "url": null
+    },
+    {
+      "id": "dubai.offplan.count.2026H1",
+      "name": "Dubai off-plan transactions",
+      "value": 58840, "unit": "transactions",
+      "period": { "type": "half", "id": "2026-H1", "from": "2026-01-01", "to": "2026-06-30", "complete": true },
+      "published": "2026-07", "verifiedAt": "2026-08-08",
+      "emirate": "Dubai", "authority": "Dubai Land Department",
+      "source": "Dubai Land Department — off-plan segment, H1 2026",
+      "dataset": "DLD H1 2026 release", "classification": "OFFICIAL · PRIMARY",
+      "methodology": null, "url": null
+    },
+    {
+      "id": "dubai.ready.value.2026H1",
+      "name": "Dubai ready-property sales value",
+      "value": 146690000000, "unit": "AED",
+      "period": { "type": "half", "id": "2026-H1", "from": "2026-01-01", "to": "2026-06-30", "complete": true },
+      "published": "2026-07", "verifiedAt": "2026-08-08",
+      "emirate": "Dubai", "authority": "Dubai Land Department",
+      "source": "Dubai Land Department — completed-property segment, H1 2026",
+      "dataset": "DLD H1 2026 release", "classification": "OFFICIAL · PRIMARY",
+      "methodology": null, "url": null
+    },
+    {
+      "id": "dubai.ready.count.2026H1",
+      "name": "Dubai ready-property transactions",
+      "value": 27160, "unit": "transactions",
+      "period": { "type": "half", "id": "2026-H1", "from": "2026-01-01", "to": "2026-06-30", "complete": true },
+      "published": "2026-07", "verifiedAt": "2026-08-08",
+      "emirate": "Dubai", "authority": "Dubai Land Department",
+      "source": "Dubai Land Department — completed-property segment, H1 2026",
+      "dataset": "DLD H1 2026 release", "classification": "OFFICIAL · PRIMARY",
+      "methodology": null, "url": null
+    },
+    {
+      "id": "dubai.sales.value.2026-07",
+      "name": "Dubai sales value",
+      "value": 34880000000, "unit": "AED",
+      "period": { "type": "month", "id": "2026-07", "from": "2026-07-01", "to": "2026-07-31", "complete": true },
+      "published": "2026-08", "verifiedAt": "2026-08-08",
+      "emirate": "Dubai", "authority": "Dubai Land Department",
+      "source": "Dubai Land Department — July 2026 monthly sales",
+      "dataset": "DLD monthly release", "classification": "OFFICIAL · PRIMARY",
+      "methodology": null, "url": null
+    },
+    {
+      "id": "dubai.sales.count.2026-07",
+      "name": "Dubai sales transactions",
+      "value": 13930, "unit": "transactions",
+      "period": { "type": "month", "id": "2026-07", "from": "2026-07-01", "to": "2026-07-31", "complete": true },
+      "published": "2026-08", "verifiedAt": "2026-08-08",
+      "emirate": "Dubai", "authority": "Dubai Land Department",
+      "source": "Dubai Land Department — July 2026 monthly sales",
+      "dataset": "DLD monthly release", "classification": "OFFICIAL · PRIMARY",
+      "methodology": null, "url": null
+    },
+    {
+      "id": "dubai.offplan.count.2026-07",
+      "name": "Dubai off-plan transactions",
+      "value": 9622, "unit": "transactions",
+      "period": { "type": "month", "id": "2026-07", "from": "2026-07-01", "to": "2026-07-31", "complete": true },
+      "published": "2026-08", "verifiedAt": "2026-08-08",
+      "emirate": "Dubai", "authority": "Dubai Land Department",
+      "source": "Dubai Land Department — July 2026, off-plan segment",
+      "dataset": "DLD monthly release", "classification": "OFFICIAL · PRIMARY",
+      "methodology": null, "url": null
+    },
+    {
+      "id": "dubai.offplan.value.2026-07",
+      "name": "Dubai off-plan sales value",
+      "value": 15960000000, "unit": "AED",
+      "period": { "type": "month", "id": "2026-07", "from": "2026-07-01", "to": "2026-07-31", "complete": true },
+      "published": "2026-08", "verifiedAt": "2026-08-08",
+      "emirate": "Dubai", "authority": "Dubai Land Department",
+      "source": "Dubai Land Department — July 2026, off-plan segment",
+      "dataset": "DLD monthly release", "classification": "OFFICIAL · PRIMARY",
+      "methodology": null, "url": null
+    },
+
+    {
+      "id": "dubai.sales.yoy.2026H1",
+      "name": "Dubai sales value, year on year",
+      "value": -12.3, "unit": "%",
+      "period": { "type": "half", "id": "2026-H1 vs 2025-H1", "from": "2026-01-01", "to": "2026-06-30", "complete": true },
+      "published": null, "verifiedAt": "2026-08-08",
+      "emirate": "Dubai", "authority": "Rendas Intelligence",
+      "source": "Calculated from two Dubai Land Department releases",
+      "dataset": "derived", "classification": "MODELLED",
+      "methodology": "(dubai.sales.value.2026H1 ÷ dubai.sales.value.2025H1) − 1. Both inputs are DLD sales-only figures for the same half-year. This is our arithmetic, not a DLD publication.",
+      "url": null
+    },
+    {
+      "id": "dubai.sales.mom.2026-07",
+      "name": "Dubai sales value, month on month",
+      "value": 6.9, "unit": "%",
+      "period": { "type": "month", "id": "2026-07 vs 2026-06", "from": "2026-07-01", "to": "2026-07-31", "complete": true },
+      "published": null, "verifiedAt": "2026-08-08",
+      "emirate": "Dubai", "authority": "Rendas Intelligence",
+      "source": "Calculated from consecutive Dubai Land Department monthly figures",
+      "dataset": "derived", "classification": "MODELLED",
+      "methodology": "July 2026 sales value ÷ June 2026 sales value − 1, both DLD sales-only. Our arithmetic, not a DLD publication.",
+      "url": null
+    },
+
+    {
+      "id": "abudhabi.sales.value.2026H1",
+      "name": "Abu Dhabi sales value",
+      "value": 86100000000, "unit": "AED",
+      "period": { "type": "half", "id": "2026-H1", "from": "2026-01-01", "to": "2026-06-30", "complete": true },
+      "published": "2026-07", "verifiedAt": "2026-08-08",
+      "emirate": "Abu Dhabi", "authority": "Abu Dhabi Real Estate Centre",
+      "source": "Abu Dhabi Real Estate Centre, via Abu Dhabi Media Office",
+      "dataset": "ADREC H1 2026 release", "classification": "OFFICIAL · AUTHORITY",
+      "methodology": null, "url": null,
+      "note": "Sales only, for like-for-like comparison with the Dubai figure. ADREC's all-registration total for the same period was AED 117bn. Never aggregate with a Dubai figure — different authority, different register."
+    },
+    {
+      "id": "abudhabi.sales.count.2026H1",
+      "name": "Abu Dhabi sales transactions",
+      "value": 16838, "unit": "transactions",
+      "period": { "type": "half", "id": "2026-H1", "from": "2026-01-01", "to": "2026-06-30", "complete": true },
+      "published": "2026-07", "verifiedAt": "2026-08-08",
+      "emirate": "Abu Dhabi", "authority": "Abu Dhabi Real Estate Centre",
+      "source": "Abu Dhabi Real Estate Centre, via Abu Dhabi Media Office",
+      "dataset": "ADREC H1 2026 release", "classification": "OFFICIAL · AUTHORITY",
+      "methodology": null, "url": null
+    },
+
+    {
+      "id": "uae.cbuae.baserate",
+      "name": "CBUAE Base Rate",
+      "value": 3.65, "unit": "%",
+      "period": { "type": "static", "id": "In force Aug 2026", "from": null, "to": null, "complete": true },
+      "published": "2026-08", "verifiedAt": "2026-08-08",
+      "emirate": "UAE", "authority": "Central Bank of the UAE",
+      "source": "Central Bank of the UAE — Base Rate",
+      "dataset": "CBUAE policy rate", "classification": "OFFICIAL · AUTHORITY",
+      "methodology": null, "url": null,
+      "note": "The policy anchor. Commercial bank mortgage pricing sits above this and is separately classified as Third-Party."
+    },
+    {
+      "id": "uae.cbuae.eibor.overnight",
+      "name": "EIBOR, overnight",
+      "value": 3.531, "unit": "%",
+      "period": { "type": "day", "id": "2026-07-29", "from": "2026-07-29", "to": "2026-07-29", "complete": true },
+      "published": "2026-07", "verifiedAt": "2026-08-08",
+      "emirate": "UAE", "authority": "Central Bank of the UAE",
+      "source": "Central Bank of the UAE — EIBOR",
+      "dataset": "EIBOR fixing", "classification": "OFFICIAL · AUTHORITY",
+      "methodology": null, "url": null
+    },
+
+    {
+      "id": "dubai.handovers.2026",
+      "name": "Scheduled residential handovers",
+      "value": 120000, "unit": "units",
+      "period": { "type": "year", "id": "2026", "from": "2026-01-01", "to": "2026-12-31", "complete": false },
+      "published": "2026", "verifiedAt": "2026-08-08",
+      "emirate": "Dubai", "authority": "Fitch Ratings; Property Monitor",
+      "source": "Fitch Ratings and Property Monitor — scheduled handovers",
+      "dataset": "private research", "classification": "THIRD-PARTY",
+      "methodology": null, "url": null, "forward": true,
+      "note": "A forward schedule, not a record of completions. Delivery routinely slips."
+    },
+    {
+      "id": "global.knightfrank.sqm_per_usd1m.dubai",
+      "name": "Prime space per USD 1 million",
+      "value": 62.2, "unit": "m²",
+      "period": { "type": "year", "id": "2026", "from": null, "to": null, "complete": true },
+      "published": "2026", "verifiedAt": "2026-08-08",
+      "emirate": "Dubai", "authority": "Knight Frank",
+      "source": "Knight Frank Wealth Report 2026",
+      "dataset": "Wealth Report 2026", "classification": "THIRD-PARTY",
+      "methodology": null, "url": null,
+      "note": "No government body publishes cross-border prime-space comparisons."
+    },
+    {
+      "id": "dubai.propertymonitor.dpi.2026-05",
+      "name": "Property Monitor Dynamic Price Index",
+      "value": 231.51, "unit": "index",
+      "period": { "type": "month", "id": "2026-05", "from": "2026-05-01", "to": "2026-05-31", "complete": true },
+      "published": "2026-06", "verifiedAt": "2026-08-08",
+      "emirate": "Dubai", "authority": "Property Monitor",
+      "source": "Property Monitor Dynamic Price Index",
+      "dataset": "DPI", "classification": "THIRD-PARTY",
+      "methodology": null, "url": null,
+      "note": "Private index. Latest reading verifiable on 8 Aug 2026; peaked at 235.03 in October 2025."
+    }
+  ]
+}

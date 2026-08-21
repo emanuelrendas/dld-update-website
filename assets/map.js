@@ -3,51 +3,63 @@
 if(!document.getElementById('map')) return;
 
 /* ═══════════════ INTERACTIVE DUBAI MAP ═══════════════ */
-/* ═══════════════ INTELLIGENCE MAP ═══════════════
-   psf   = indicative price per sqft (AED)
-   yl    = gross yield midpoint (%)
-   gr    = growth outlook score 1-5
-   rk    = supply risk score 1-5 (5 = highest risk)
-   band  = entry filter bucket
-   All figures indicative, sourced from DLD registered transactions,
-   Property Monitor, Knight Frank and Colliers releases. Aug 2026. */
+/* ═══════════════ INTELLIGENCE MAP — DUBAI ONLY ═══════════════
+   gr    = growth outlook score 1-5      ] Rendas Intelligence,
+   rk    = supply risk score 1-5         ] ordinal judgement,
+   pres  = capital preservation 1-5      ] rubric published on the page
+   b     = indicative entry range        — Modelled
+   band  = entry filter bucket           — Modelled
+
+   WHAT IS NOT HERE, AND WHY. Price per sqft, gross yield, net yield,
+   service charge, supply absorption and liquidity depth were all removed.
+   None of them derives from the DLD register, and the site's standard is
+   that an empty state beats an unsupported number. Price per sqft and the
+   entry range return as OFFICIAL the day Dubai Pulse credentials are set —
+   the register publishes meter_sale_price directly, and percentiles of
+   actual_worth give a real entry band. Gross and net yield need rent data
+   joined to sales at unit level, which no validated method yet provides.
+
+   SCOPE. Dubai submarkets only. Abu Dhabi and Ras Al Khaimah addresses
+   were removed from this map because they are not in the DLD register and
+   presenting them on the same canvas implied they were. Abu Dhabi now sits
+   in the separately-headed UAE Regional Comparison on /addresses, carrying
+   its own official ADREC figures and its own jurisdiction label.
+
+   PROVENANCE. These are INDICATIVE ranges, not calculated DLD statistics.
+   They are not derived from the DLD transaction register and must not be
+   presented as though they were. Price per sqft is rounded deliberately:
+   an indicative range does not support a figure like 3,027, and printing
+   one manufactures precision the evidence cannot carry.
+
+   Verified 8 August 2026.                                              */
 const AREAS = {
-  palm:     {n:"Palm Jumeirah", b:"AED 5M — 150M+", psf:3027, yl:5.0, gr:4, rk:1, band:"o20", st:"ready", net_n:3.3, sc:32, ab:0.31, pres:5, liq:"Deep",
+  palm:     {n:"Palm Jumeirah", b:"AED 5M — 150M+", gr:4, rk:1, band:"o20", st:"ready", pres:5,
              d:"Fixed island, permanent supply constraint. Signature villas and Garden Homes for clients acquiring assets their grandchildren will hold.",
-             c:"Trophy · beachfront", y:"UHNWI, international", r:"Appreciation-led", net:"4 — 6%"},
-  bay:      {n:"Jumeirah Bay Island", b:"AED 15M — 120M+", psf:3400, yl:4.0, gr:4, rk:1, band:"o20", st:"ready", net_n:2.9, sc:38, ab:0.18, pres:5, liq:"Thin",
+             c:"Trophy · beachfront", y:"UHNWI, international", r:"Appreciation-led"},
+  bay:      {n:"Jumeirah Bay Island", b:"AED 15M — 120M+", gr:4, rk:1, band:"o20", st:"ready", pres:5,
              d:"The seahorse island. Bulgari-anchored, severely limited inventory, and one of the strongest price trajectories in the region.",
-             c:"Ultra-prime · island", y:"Collectors of assets", r:"Appreciation-led", net:"3 — 5%"},
-  hills2:   {n:"Emirates Hills", b:"AED 20M — 100M+", psf:2400, yl:4.0, gr:3, rk:1, band:"o20", st:"ready", net_n:3.1, sc:22, ab:0.12, pres:5, liq:"Thin",
+             c:"Ultra-prime · island", y:"Collectors of assets", r:"Appreciation-led"},
+  hills2:   {n:"Emirates Hills", b:"AED 20M — 100M+", gr:3, rk:1, band:"o20", st:"ready", pres:5,
              d:"Dubai's original gated enclave. Mature landscaping, absolute privacy, and a resident register that reads like a market index.",
-             c:"Villas · established", y:"Principals, families", r:"Appreciation-led", net:"3 — 5%"},
-  downtown: {n:"Downtown Dubai", b:"AED 2M — 40M", psf:2450, yl:6.0, gr:3, rk:3, band:"2to8", st:"both", net_n:4.6, sc:24, ab:0.68, pres:4, liq:"Deep",
+             c:"Villas · established", y:"Principals, families", r:"Appreciation-led"},
+  downtown: {n:"Downtown Dubai", b:"AED 2M — 40M", gr:3, rk:3, band:"2to8", st:"both", pres:4,
              d:"Burj Khalifa district. The most liquid resale market in the city — for clients who value exit optionality as much as entry.",
-             c:"Urban · liquid", y:"Investors, professionals", r:"Balanced", net:"5 — 7%"},
-  marina:   {n:"Dubai Marina", b:"AED 1.2M — 20M", psf:1850, yl:7.0, gr:3, rk:3, band:"u2", st:"ready", net_n:5.4, sc:20, ab:0.42, pres:4, liq:"Deep",
+             c:"Urban · liquid", y:"Investors, professionals", r:"Balanced"},
+  marina:   {n:"Dubai Marina", b:"AED 1.2M — 20M", gr:3, rk:3, band:"u2", st:"ready", pres:4,
              d:"The city's most established waterfront rental market. Deep tenant demand, proven liquidity, and the strongest entry point for first-time Dubai investors.",
-             c:"Waterfront · rental", y:"Yield investors, expats", r:"Income-led", net:"6 — 8%"},
-  difc:     {n:"DIFC", b:"AED 1.8M — 25M", psf:2200, yl:7.0, gr:3, rk:2, band:"u2", st:"ready", net_n:5.3, sc:26, ab:0.55, pres:4, liq:"Moderate",
+             c:"Waterfront · rental", y:"Yield investors, expats", r:"Income-led"},
+  difc:     {n:"DIFC", b:"AED 1.8M — 25M", gr:3, rk:2, band:"u2", st:"ready", pres:4,
              d:"The financial centre's residential core. Professional tenant depth and rental performance that behaves like infrastructure.",
-             c:"Financial · yield", y:"Yield investors", r:"Income-led", net:"6 — 8%"},
-  hills:    {n:"Dubai Hills Estate", b:"AED 2.5M — 45M", psf:1900, yl:6.0, gr:4, rk:3, band:"2to8", st:"both", net_n:4.4, sc:18, ab:0.74, pres:4, liq:"Moderate",
+             c:"Financial · yield", y:"Yield investors", r:"Income-led"},
+  hills:    {n:"Dubai Hills Estate", b:"AED 2.5M — 45M", gr:4, rk:3, band:"2to8", st:"both", pres:4,
              d:"Emaar's flagship community. Schools, parkland, golf frontage — where relocating families anchor and end-user demand keeps deepening.",
-             c:"Family · growth", y:"End-users, relocators", r:"Balanced", net:"5 — 7%"},
-  creek:    {n:"Dubai Creek Harbour", b:"AED 1.5M — 18M", psf:1750, yl:6.0, gr:4, rk:4, band:"u2", st:"offplan", net_n:4.1, sc:16, ab:1.35, pres:3, liq:"Moderate",
+             c:"Family · growth", y:"End-users, relocators", r:"Balanced"},
+  creek:    {n:"Dubai Creek Harbour", b:"AED 1.5M — 18M", gr:4, rk:4, band:"u2", st:"offplan", pres:3,
              d:"Emaar's next waterfront district. Pre-handover pricing on a masterplan still years from completion — a genuine off-plan case with genuine delivery risk.",
-             c:"Emerging · off-plan", y:"Forward investors", r:"Growth-led", net:"5 — 7%"},
-  saadiyat: {n:"Saadiyat Island · Abu Dhabi", b:"AED 2M — 30M+", psf:2300, yl:5.0, gr:5, rk:2, band:"2to8", st:"both", net_n:3.6, sc:20, ab:0.58, pres:5, liq:"Moderate",
-             d:"The capital's most prestigious address. Louvre, Guggenheim and Zayed National Museum anchor cultural infrastructure no other UAE address can match. A capital preservation mandate, not an income one.",
-             c:"Cultural · prestige", y:"Long-horizon capital", r:"Appreciation-led", net:"4.5 — 5.5%"},
-  yas:      {n:"Yas Island · Abu Dhabi", b:"AED 700K — 8M", psf:1500, yl:7.0, gr:4, rk:4, band:"u2", st:"both", net_n:5.1, sc:15, ab:1.62, pres:3, liq:"Moderate",
-             d:"Abu Dhabi's entertainment core and its largest pipeline — roughly 7,700 units under construction. Lower entry than Saadiyat with genuine rental depth from a constant event calendar.",
-             c:"Events · lifestyle", y:"Balanced investors", r:"Income-led", net:"6 — 8%"},
-  marjan:   {n:"Al Marjan Island · RAK", b:"AED 900K — 12M", psf:1452, yl:6.2, gr:4, rk:5, band:"u2", st:"offplan", net_n:4.6, sc:12, ab:2.1, pres:2, liq:"Thin",
-             d:"Wynn Al Marjan, the UAE's first licensed casino resort, opens 2027. Much of the catalyst is already priced in, and RAK transacts a fraction of Dubai's volume. I advise here on today's rents — never on a projected opening.",
-             c:"Event-driven", y:"Higher risk appetite", r:"Income + catalyst", net:"5.5 — 7%"},
-  south:    {n:"Dubai South", b:"AED 600K — 4M", psf:1275, yl:7.75, gr:5, rk:4, band:"u2", st:"offplan", net_n:5.8, sc:11, ab:1.88, pres:3, liq:"Thin",
+             c:"Emerging · off-plan", y:"Forward investors", r:"Growth-led"},
+  south:    {n:"Dubai South", b:"AED 600K — 4M", gr:5, rk:4, band:"u2", st:"offplan", pres:3,
              d:"Built around Al Maktoum International — an AED 128bn expansion targeting 260 million annual passengers. A five-to-ten-year infrastructure thesis, not a two-year trade.",
-             c:"Infrastructure play", y:"Patient capital", r:"Growth-led", net:"6.5 — 9%"}
+             c:"Infrastructure play", y:"Patient capital", r:"Growth-led"}
 };
 
 /* ── heat scales per layer ── */
@@ -56,17 +68,13 @@ const AREAS = {
 const SCALE_NEUTRAL = ['#1F7A6B','#3E9C7A','#9AA352','#D0A048','#F0C674'];
 const SCALE_RISK    = ['#1A8A5C','#7FA83E','#D4A72C','#D97A2B','#C2452D'];
 const LAYERS = {
-  price:  {t:'Price per sqft', lo:'Lower entry', hi:'Prime pricing', sc:SCALE_NEUTRAL,
-           v:a=>a.psf, min:1275, max:3400, fmt:a=>'AED '+a.psf.toLocaleString()},
-  yield:  {t:'Gross yield', lo:'Lower yield', hi:'Higher yield', sc:SCALE_NEUTRAL,
-           v:a=>a.yl, min:4.0, max:7.75, fmt:a=>a.net},
   growth: {t:'Growth outlook', lo:'Steady', hi:'Strongest', sc:SCALE_NEUTRAL,
            v:a=>a.gr, min:3, max:5, fmt:a=>['','Limited','Modest','Steady','Strong','Strongest'][a.gr]},
   risk:   {t:'Supply & delivery risk', lo:'Lowest risk', hi:'Highest risk', sc:SCALE_RISK,
            v:a=>a.rk, min:1, max:5, fmt:a=>['','Very low','Low','Moderate','Elevated','High'][a.rk]}
 };
 
-let activeLayer  = 'price';
+let activeLayer  = 'growth';
 let activeFilter = 'all';
 let activeArea   = 'palm';
 let activeStruct = 'ready';   /* Level 0 gate */
@@ -109,7 +117,7 @@ function paintMap(){
 
   document.getElementById('map-count').textContent =
     (activeStruct === 'ready' ? 'Completed' : 'Off-plan') + ' · ' + L.t + ' · ' + shown +
-    (shown === 1 ? ' market' : ' markets');
+    (shown === 1 ? ' Dubai market' : ' Dubai markets');
 
   /* highlight the extremes of the active layer so the switch is unmistakable */
   const vis = Object.keys(AREAS).filter(k=> matchesStruct(AREAS[k]) && (activeFilter==='all' || AREAS[k].band===activeFilter));
@@ -137,27 +145,8 @@ function selectArea(key){
   document.getElementById('mp-band').textContent   = a.b;
   document.getElementById('mp-desc').textContent   = a.d;
   document.getElementById('mp-yield').textContent  = a.r;
-  document.getElementById('mp-psf').textContent    = 'AED ' + a.psf.toLocaleString();
-
   const STRUCT = {ready:'Completed / secondary', offplan:'Off-plan pipeline', both:'Both structures available'};
   document.getElementById('mp-struct').textContent = STRUCT[a.st];
-
-  /* gross → net bridge, stated line by line */
-  const scPct   = (a.sc * 12) / a.psf * 100 / 12 * 12;      /* service charge as % of value */
-  const scDrag  = a.sc / a.psf * 100;
-  const mgDrag  = a.yl * 0.07;                               /* management + void allowance */
-  const dldDrag = 4 / 7;                                     /* 4% DLD amortised over a 7-year hold */
-  document.getElementById('yb-gross').textContent = a.yl.toFixed(2) + '%';
-  document.getElementById('yb-sc').textContent    = '-' + scDrag.toFixed(2) + '%';
-  document.getElementById('yb-mg').textContent    = '-' + mgDrag.toFixed(2) + '%';
-  document.getElementById('yb-dld').textContent   = '-' + dldDrag.toFixed(2) + '%';
-  document.getElementById('yb-net').textContent   = a.net_n.toFixed(2) + '%';
-
-  /* absorption: pipeline units ÷ annual absorption. Above 1.0 = oversupplied */
-  const ab = a.ab;
-  document.getElementById('mp-abs').textContent =
-    ab.toFixed(2) + '× · ' + (ab < 0.5 ? 'constrained' : ab < 1.0 ? 'balanced' : ab < 1.5 ? 'loosening' : 'oversupplied');
-  document.getElementById('mp-liq').textContent = a.liq;
 
   document.getElementById('mp-growth').textContent = LAYERS.growth.fmt(a);
   document.getElementById('mp-risk').textContent   = LAYERS.risk.fmt(a);
@@ -193,7 +182,7 @@ document.querySelectorAll('.gate-b').forEach(b=>{
     b.classList.add('on');
     activeStruct = b.dataset.st;
     /* absorption matters for pipeline; liquidity matters for completed stock */
-    const preferred = activeStruct === 'offplan' ? 'risk' : 'yield';
+    const preferred = activeStruct === 'offplan' ? 'risk' : 'growth';
     document.querySelectorAll('.map-tb').forEach(t=>t.classList.toggle('on', t.dataset.layer===preferred));
     activeLayer = preferred;
     paintMap();
@@ -216,12 +205,8 @@ selectArea('palm');
    where "better" is unambiguous — price per sqft and entry band are
    left neutral, because cheaper is not better, it is different. */
 const CMP_ROWS = [
-  {k:'Price / sqft',      v:a=>'AED '+a.psf.toLocaleString(), dir:0},
-  {k:'Gross yield',       v:a=>a.yl.toFixed(1)+'%',           dir:1, n:a=>a.yl},
-  {k:'Net yield',         v:a=>a.net_n.toFixed(2)+'%',        dir:1, n:a=>a.net_n},
-  {k:'Service charge',    v:a=>'AED '+a.sc+' / sqft',         dir:-1, n:a=>a.sc},
-  {k:'Supply absorption', v:a=>a.ab.toFixed(2)+'×',           dir:-1, n:a=>a.ab},
-  {k:'Liquidity depth',   v:a=>a.liq,                          dir:0},
+  {k:'Median price / sqft', v:()=>'Awaiting official DLD data', dir:0},
+  {k:'Gross yield',         v:()=>'Not available from official data', dir:0},
   {k:'Growth outlook',    v:a=>LAYERS.growth.fmt(a),           dir:1, n:a=>a.gr},
   {k:'Supply risk',       v:a=>LAYERS.risk.fmt(a),             dir:-1, n:a=>a.rk},
   {k:'Capital preservation', v:a=>a.pres+' / 5',               dir:1, n:a=>a.pres},

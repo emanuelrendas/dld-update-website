@@ -575,12 +575,17 @@ footer{border-top:1px solid var(--line);padding:64px 0 38px;background:var(--voi
 
 /* ═══════════════ PROVENANCE LAYER ═══════════════ */
 .src{position:relative;border-bottom:1px dotted rgba(196,162,101,0.45);cursor:help;}
+/* Labelled provenance: source, the period the data covers, and the date it
+   was checked. Data period and verification date are different facts and
+   are never collapsed into one line — a July dataset checked in August is
+   not August data. */
 .src::after{
-  content:attr(data-src) " · " attr(data-date) " · " attr(data-conf);
+  content:"SOURCE\A" attr(data-src) "\A\A DATA PERIOD\A" attr(data-period)
+          "\A\A VERIFIED\A" attr(data-verified) "\A\A CONFIDENCE\A" attr(data-conf);
   position:absolute;left:50%;bottom:calc(100% + 11px);transform:translateX(-50%) translateY(5px);
   background:var(--graphite);color:var(--ivory);border:1px solid var(--champ-dim);
-  padding:11px 15px;font-family:'Inter',sans-serif;font-size:10.5px;letter-spacing:0.04em;
-  line-height:1.55;white-space:normal;width:max-content;max-width:290px;text-transform:none;
+  padding:12px 15px;font-family:'Inter',sans-serif;font-size:10.5px;letter-spacing:0.04em;
+  line-height:1.5;white-space:pre-line;width:max-content;max-width:290px;text-transform:none;
   font-weight:400;font-style:normal;opacity:0;pointer-events:none;
   transition:opacity .25s var(--ease),transform .25s var(--ease);z-index:70;
   box-shadow:0 14px 40px rgba(0,0,0,0.55);
@@ -592,16 +597,61 @@ footer{border-top:1px solid var(--line);padding:64px 0 38px;background:var(--voi
 }
 .src:hover::after,.src:focus::after,.src.open::after{opacity:1;transform:translateX(-50%) translateY(0);}
 .src:hover::before,.src:focus::before,.src.open::before{opacity:1;}
-.src[data-conf="Verified"]{border-bottom-color:rgba(26,107,74,0.6);}
-.src[data-conf="Indicative"]{border-bottom-color:rgba(196,162,101,0.5);}
-.src[data-conf="Forecast"]{border-bottom-color:rgba(139,32,32,0.5);}
+/* The stat cards clip their own overflow to contain a top rule or a radial
+   sweep, and the sourced figure sits 45–150px from the card's top edge —
+   never enough room for the panel, so it was being cut off on every card.
+   Lifting the clip only while the panel is open lets it through. Every one
+   of those decorations is bounded by inset:0 or an explicit edge, so none
+   of them spill when it lifts. */
+.data-c:has(.src:hover),.data-c:has(.src:focus),.data-c:has(.src.open),
+.ins-c:has(.src:hover), .ins-c:has(.src:focus), .ins-c:has(.src.open),
+.addr-c:has(.src:hover),.addr-c:has(.src:focus),.addr-c:has(.src.open){overflow:visible;}
+
+.src[data-conf^="OFFICIAL · PRIMARY"]{border-bottom-color:rgba(111,191,154,0.65);}
+.src[data-conf^="OFFICIAL · AUTHORITY"]{border-bottom-color:rgba(127,178,212,0.6);}
+.src[data-conf^="THIRD-PARTY"]{border-bottom-color:rgba(196,162,101,0.5);}
+.src[data-conf^="MODELLED"]{border-bottom-color:rgba(185,168,138,0.45);}
+
+/* ═══════════ CLASSIFICATION BADGES ═══════════
+   Five tiers, never the word "Official" on its own. A reader must be able
+   to tell a Land Department figure from a bank's own pricing from my
+   judgement without reading the footnote. */
+.cls{display:inline-block;font-size:7.5px;letter-spacing:0.16em;text-transform:uppercase;
+     padding:2px 6px;border:1px solid;margin-left:7px;vertical-align:middle;
+     font-weight:700;font-family:'Inter',sans-serif;white-space:nowrap;}
+.cls-p{color:#6FBF9A;border-color:rgba(111,191,154,0.45);}   /* Official — Primary   */
+.cls-a{color:#7FB2D4;border-color:rgba(127,178,212,0.42);}   /* Official — Authority */
+.cls-t{color:var(--champ-hi);border-color:var(--champ-dim);} /* Third-Party          */
+.cls-m{color:#B9A88A;border-color:rgba(185,168,138,0.38);}   /* Modelled             */
+.cls-u{color:var(--smoke);border-color:rgba(140,140,140,0.32);} /* User input        */
+
+/* Where a metric has no defensible source yet. Never a placeholder number —
+   the absence is the honest answer, and it is stated as one. */
+.na{color:var(--smoke);font-style:italic;font-size:11.5px;}
+/* A superseded figure keeps its value and loses its confidence. It is never
+   removed silently and never presented as current. */
+.is-stale{opacity:.72;}
+.is-stale::after{content:" ⌁";color:var(--champ-hi);font-size:.8em;}
+.src[data-conf*="STALE"]{border-bottom-style:dashed;border-bottom-color:rgba(196,162,101,0.55);}
+.live-h .dot{transition:background .3s,box-shadow .3s;}
+.na b{color:var(--champ-hi);font-style:normal;font-weight:500;}
+.mp-row .na{font-size:10.5px;}
+
+/* Always-visible provenance, for figures sitting inside a scroll container
+   where the hover tooltip would be clipped by overflow. Same three facts,
+   stated once for the whole block instead of per figure. */
+.srcbar{display:flex;flex-wrap:wrap;gap:16px 40px;padding:15px 0 0;margin:14px 0 0;border-top:1px solid var(--line);}
+.srcbar>div{display:flex;flex-direction:column;gap:4px;}
+.srcbar dt{font-size:8px;letter-spacing:0.2em;color:var(--champagne);text-transform:uppercase;font-weight:700;}
+.srcbar dd{font-size:11px;color:var(--smoke);margin:0;line-height:1.5;}
 
 .prov-key{display:flex;gap:26px;flex-wrap:wrap;padding:20px 0 0;margin-top:24px;border-top:1px solid var(--line);}
 .prov-key span{font-size:9.5px;letter-spacing:0.16em;color:var(--smoke);text-transform:uppercase;display:flex;align-items:center;gap:8px;}
 .prov-key i{width:16px;height:0;border-bottom:1px dotted;display:block;}
-.prov-key .v i{border-color:rgba(26,107,74,0.9);}
+.prov-key .v i{border-color:rgba(111,191,154,0.9);}
+.prov-key .a i{border-color:rgba(127,178,212,0.9);}
 .prov-key .i i{border-color:rgba(196,162,101,0.9);}
-.prov-key .f i{border-color:rgba(139,32,32,0.9);}
+.prov-key .f i{border-color:rgba(185,168,138,0.9);}
 .updated{font-size:9.5px;letter-spacing:0.16em;color:var(--smoke);text-transform:uppercase;margin-top:12px;}
 .updated b{color:var(--champ-hi);font-weight:500;}
 @media(max-width:620px){.src::after{max-width:220px;font-size:10px;}}

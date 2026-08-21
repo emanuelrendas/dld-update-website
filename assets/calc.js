@@ -21,113 +21,102 @@ const AEDk = n => Math.abs(n) >= 1e6
   ? 'AED ' + (n/1e6).toFixed(2) + 'M'
   : 'AED ' + Math.round(n/1000) + 'K';
 
-/* monthly payment on an amortising loan */
-function monthlyPayment(principal, annualRate, years){
-  if(principal <= 0) return 0;
-  const r = annualRate/100/12, n = years*12;
-  if(r === 0) return principal/n;
-  return principal * r / (1 - Math.pow(1+r, -n));
+/* Every engine below delegates to assets/finance.js. That file holds the
+   single definition of net operating income and net yield used across the
+   whole site, so two panels can no longer disagree about the same asset. */
+const F = window.Finance;
+const val = (id, d = 0) => { const el = document.getElementById(id); return el ? (+el.value || d) : d; };
+
+/* Reads the Lab's inputs into the shape the shared engine expects. */
+function labInputs(appreciation){
+  return {
+    price: val('L-price'),
+    rent:  val('L-rent'),
+    serviceCharge: val('L-sc'),
+    mgmtPct:    val('L-mgmt', 5) / 100,
+    vacancyPct: val('L-vac', 8.33) / 100,
+    maintPct:   val('L-maint', 5) / 100,
+    ltvPct: val('L-ltv'),
+    otherCosts: val('L-other'),
+    rate:   val('L-rate'),
+    term:   val('L-term', 25),
+    years:  val('L-exit', 5),
+    appreciationPct: appreciation,
+  };
 }
-/* outstanding balance after m months */
-function loanBalance(principal, annualRate, years, monthsPaid){
-  if(principal <= 0) return 0;
-  const r = annualRate/100/12, n = years*12;
-  if(monthsPaid >= n) return 0;
-  if(r === 0) return principal * (1 - monthsPaid/n);
-  const pmt = monthlyPayment(principal, annualRate, years);
-  return principal*Math.pow(1+r,monthsPaid) - pmt*((Math.pow(1+r,monthsPaid)-1)/r);
-}
-/* IRR by bisection — robust, no derivative needed */
-function irr(flows){
-  const npv = r => flows.reduce((s,cf,t)=> s + cf/Math.pow(1+r,t), 0);
-  let lo = -0.95, hi = 3;
-  if(npv(lo) * npv(hi) > 0) return null;
-  for(let i=0;i<200;i++){
-    const mid = (lo+hi)/2;
-    if(npv(lo)*npv(mid) <= 0) hi = mid; else lo = mid;
-  }
-  return (lo+hi)/2*100;
-}
-
-/* full model for one appreciation assumption */
-function model(appreciation){
-  const P    = +document.getElementById('L-price').value || 0;
-  const rent = +document.getElementById('L-rent').value || 0;
-  const sc   = +document.getElementById('L-sc').value || 0;
-  const mgmt = +document.getElementById('L-mgmt').value / 100;
-  const ltv  = +document.getElementById('L-ltv').value / 100;
-  const rate = +document.getElementById('L-rate').value || 0;
-  const term = +document.getElementById('L-term').value;
-  const yrs  = +document.getElementById('L-exit').value;
-
-  const loan   = P * ltv;
-  const down   = P - loan;
-  const dld    = P * 0.04;
-  const comm   = P * 0.02;
-  const mreg   = loan * 0.0025;
-  const reg    = P > 500000 ? 4000 : 2000;
-  const cashIn = down + dld + comm + mreg + reg;
-
-  const pmtM   = monthlyPayment(loan, rate, term);
-  const pmtY   = pmtM * 12;
-  const netOp  = rent - sc - (rent * mgmt);      /* net operating income */
-  const cfY    = netOp - pmtY;                    /* after debt service */
-
-  const exitVal = P * Math.pow(1 + appreciation/100, yrs);
-  const balance = loanBalance(loan, rate, term, yrs*12);
-  const sellCost= exitVal * 0.02;
-  const netProc = exitVal - balance - sellCost;
-
-  const totalProfit = netProc - cashIn + (cfY * yrs);
-  const totalReturn = cashIn > 0 ? totalProfit / cashIn * 100 : 0;
-  const coc         = cashIn > 0 ? cfY / cashIn * 100 : 0;
-
-  const flows = [-cashIn];
-  for(let i=1;i<=yrs;i++) flows.push(i === yrs ? cfY + netProc : cfY);
-  const r = irr(flows);
-
-  return {P,loan,down,dld,comm,mreg,reg,cashIn,pmtY,netOp,cfY,
-          exitVal,balance,sellCost,netProc,totalProfit,totalReturn,coc,irr:r,yrs};
-}
+const model = (appreciation) => F.allInReturn(labInputs(appreciation));
 
 function runLab(){
   if(!document.getElementById('L-price')) return;
-  const base = +document.getElementById('L-app').value || 0;
+  const base = val('L-app');            /* user assumption, 0 unless typed */
   const dn = model(Math.max(-10, base - 3));
   const md = model(base);
   const up = model(base + 3);
 
+  const yrs = md.years;
+  /* Say the horizon out loud. A cumulative +64% sitting beside an IRR reads
+     as annual to anyone skimming, and that is the reader this panel is for. */
+  document.querySelectorAll('.scn .sl').forEach(el => {
+    el.textContent = 'Total return over ' + yrs + (yrs === 1 ? ' year' : ' years');
+  });
+
   const setScn = (id, m, appr) => {
-    document.getElementById(id).textContent = (m.totalReturn>=0?'+':'') + m.totalReturn.toFixed(0) + '%';
-    document.getElementById(id+'-a').textContent = appr.toFixed(1) + '% / yr · ' + AEDk(m.totalProfit);
+    document.getElementById(id).textContent = (m.totalReturnPct>=0?'+':'') + m.totalReturnPct.toFixed(0) + '%';
+    const ann = m.annualisedPct === null ? 'n/a' :
+      (m.annualisedPct>=0?'+':'') + m.annualisedPct.toFixed(1) + '% / yr annualised';
+    document.getElementById(id+'-a').textContent =
+      appr.toFixed(1) + '% growth · ' + ann + ' · ' + AEDk(m.profit);
   };
   setScn('S-dn', dn, Math.max(-10, base-3));
   setScn('S-md', md, base);
   setScn('S-up', up, base+3);
 
-  document.getElementById('K-cash').textContent = AEDk(md.cashIn);
-  document.getElementById('K-cf').textContent   = AEDk(md.cfY);
-  document.getElementById('K-cf-box').classList.toggle('neg', md.cfY < 0);
-  document.getElementById('K-coc').textContent  = md.coc.toFixed(1) + '%';
-  document.getElementById('K-irr').textContent  = md.irr === null ? 'n/a' : md.irr.toFixed(1) + '%';
+  const S = (id,v)=>{ const el=document.getElementById(id); if(el) el.textContent = v; };
 
-  const S = (id,v)=> document.getElementById(id).textContent = v;
-  S('F-down', AED(md.down));  S('F-dld', AED(md.dld));
-  S('F-comm', AED(md.comm));  S('F-mreg', AED(md.mreg));
+  S('K-cash', AEDk(md.cashIn));
+  S('K-cf',   AEDk(md.cashFlow));
+  document.getElementById('K-cf-box').classList.toggle('neg', md.cashFlow < 0);
+  S('K-coc', md.cashOnCashPct.toFixed(1) + '%');
+  S('K-irr', md.irrPct === null ? 'n/a' : md.irrPct.toFixed(1) + '%');
+  S('K-ann', md.annualisedPct === null ? 'n/a' : (md.annualisedPct>=0?'+':'') + md.annualisedPct.toFixed(1) + '%');
+
+  /* operating bridge — the displayed lines ARE the calculation */
+  const op = md.operating;
+  S('Y-rent',  AED(op.rent));
+  S('Y-vac',   '-' + AED(op.vacancy));
+  S('Y-sc',    '-' + AED(op.serviceCharge));
+  S('Y-mgmt',  '-' + AED(op.management));
+  S('Y-maint', '-' + AED(op.maintenance));
+  S('Y-noi',   AED(op.total));
+  S('Y-gross', F.grossYield(op.rent, md.price).toFixed(2) + '%');
+  S('Y-net',   (md.price > 0 ? op.total / md.price * 100 : 0).toFixed(2) + '%');
+
+  S('F-down', AED(md.down));
+  S('F-dld',  AED(md.acquisition.dld));
+  S('F-comm', AED(md.acquisition.agency));
+  S('F-mreg', AED(md.acquisition.mortgage));
+  S('F-other', AED(md.acquisition.other));
   S('F-in',   AED(md.cashIn));
-  S('F-mort', md.pmtY>0 ? '-' + AED(md.pmtY) : AED(0));
+  S('F-mort', md.debtYear>0 ? '-' + AED(md.debtYear) : AED(0));
   S('F-exit', AED(md.exitVal));
   S('F-bal',  md.balance>0 ? '-' + AED(md.balance) : AED(0));
   S('F-sell', '-' + AED(md.sellCost));
-  S('F-net',  AED(md.netProc));
+  S('F-net',  AED(md.netProceeds));
 }
-['L-price','L-rent','L-sc','L-mgmt','L-ltv','L-rate','L-term','L-exit','L-app']
+['L-price','L-rent','L-sc','L-mgmt','L-vac','L-maint','L-ltv','L-rate','L-term','L-exit','L-app','L-other']
   .forEach(id=>{ const el=document.getElementById(id); if(el) el.addEventListener('input', runLab); });
 runLab();
 
 /* ═══════════════ STR / LONG-TERM NOI ENGINE ═══════════════
-   All fee inputs from DET published schedules and operator benchmarks, Aug 2026.
-   Seasonality: 7 peak months at stated ADR, 5 trough months at 62% of it. */
+   Statutory fees (DET registration and permit bands, Tourism Dirham range,
+   municipality fee, VAT) come from DET published schedules.
+
+   Everything else below is a MODEL ASSUMPTION and is disclosed as one on
+   the page: which permit band is charged, AED 15 a night for Tourism
+   Dirham, AED 13,200 a year of utilities, four-year furnishing
+   amortisation, and the seasonality split — 7 peak months at the stated
+   ADR, 5 trough months at 62% of it. None of these are official figures
+   and none are presented as DLD or DET data. Verified 8 Aug 2026. */
 let strMode = 'str';
 
 function strModel(){
@@ -142,34 +131,43 @@ function strModel(){
 
   const serviceCharge = size * scR;
 
-  /* ── LONG-TERM ── */
-  const ltGross = rent;
-  const ltMgmt  = rent * 0.05;                 /* letting + management */
-  const ltVoid  = rent * (1/12);               /* one month void allowance between tenancies */
-  const ltNet   = ltGross - serviceCharge - ltMgmt - ltVoid;
+  /* ── LONG-TERM ──
+     Identical definition to the Lab and the Quick ROI panel. */
+  const op      = F.noi({ rent, serviceCharge });
+  const ltGross = op.rent;
+  const ltMgmt  = op.management;
+  const ltVoid  = op.vacancy;
+  const ltMaint = op.maintenance;
+  const ltNet   = op.total;
 
-  /* ── SHORT-TERM ── */
+  /* ── SHORT-TERM ──
+     Every assumption below is now an editable field on the page rather
+     than a constant buried in this file. Defaults shown in brackets. */
+  const troughPct = val('T-trough', 62) / 100;   /* summer ADR as a share of peak */
+  const tourismPN = val('T-tourism', 15);        /* Tourism Dirham per occupied night */
+  const permit    = val('T-permit', 670);        /* DET annual unit permit */
+  const utilities = val('T-util', 13200);        /* DEWA, chiller, connectivity, consumables */
+  const amortYrs  = val('T-amort', 4) || 4;      /* furnishing amortisation period */
+
   const peakNights   = 213;                    /* Oct–Apr */
   const troughNights = 152;                    /* May–Sep */
-  const troughADR    = adr * 0.62;
+  const troughADR    = adr * troughPct;
   const bookedPeak   = peakNights * occ;
   const bookedTrough = troughNights * occ;
   const strGross     = bookedPeak * adr + bookedTrough * troughADR;
   const nightsBooked = bookedPeak + bookedTrough;
 
   const opFee    = strGross * opP;
-  const opVat    = opFee * 0.05;               /* 5% VAT on operator services */
-  const tourism  = nightsBooked * 15;          /* Tourism Dirham, AED 10–20/night — modelled as owner-borne */
+  const opVat    = opFee * 0.05;               /* 5% VAT on operator services — official */
+  const tourism  = nightsBooked * tourismPN;
   /* 7% municipality fee is guest-borne under standard operator structures and is
      therefore excluded from owner NOI. Confirm treatment in the operator agreement. */
-  const permit   = 670;                        /* DET annual unit permit, 1BR band */
-  const utilities= 13200;                      /* DEWA, chiller, connectivity, consumables */
-  const capex    = furn / 4;                   /* furnishing amortised over four years */
+  const capex    = furn / amortYrs;
   const strNet   = strGross - serviceCharge - opFee - opVat - tourism - permit - utilities - capex;
 
   const revpar = nightsBooked ? strGross / 365 : 0;
 
-  return {P,size,serviceCharge,ltGross,ltMgmt,ltVoid,ltNet,
+  return {P,size,serviceCharge,ltGross,ltMgmt,ltVoid,ltMaint,ltNet,
           strGross,opFee,opVat,tourism,permit,utilities,capex,strNet,
           nightsBooked,revpar,adr,troughADR,occ};
 }
@@ -186,8 +184,9 @@ function renderSTR(){
     rows.innerHTML =
       `<div class="noi-r gross"><span class="nk">Contract rent</span><span class="nv">${A(m.ltGross)}</span></div>
        <div class="noi-r"><span class="nk">Service charge · ${m.size} sqft</span><span class="nv neg">-${A(m.serviceCharge)}</span></div>
-       <div class="noi-r"><span class="nk">Letting &amp; management (5%)</span><span class="nv neg">-${A(m.ltMgmt)}</span></div>
-       <div class="noi-r"><span class="nk">Void allowance (1 month)</span><span class="nv neg">-${A(m.ltVoid)}</span></div>
+       <div class="noi-r"><span class="nk">Vacancy allowance</span><span class="nv neg">-${A(m.ltVoid)}</span></div>
+       <div class="noi-r"><span class="nk">Property management</span><span class="nv neg">-${A(m.ltMgmt)}</span></div>
+       <div class="noi-r"><span class="nk">Maintenance allowance</span><span class="nv neg">-${A(m.ltMaint)}</span></div>
        <div class="noi-r net"><span class="nk">Net operating income</span><span class="nv">${A(m.ltNet)}</span></div>
        <div class="noi-r"><span class="nk">Gross yield</span><span class="nv">${(m.ltGross/m.P*100).toFixed(2)}%</span></div>
        <div class="noi-r"><span class="nk">Net yield</span><span class="nv">${(m.ltNet/m.P*100).toFixed(2)}%</span></div>`;
@@ -212,7 +211,11 @@ function renderSTR(){
   const delta = m.strNet - m.ltNet;
   const deltaPct = m.ltNet !== 0 ? delta / Math.abs(m.ltNet) * 100 : 0;
   const grossSpread = m.ltGross ? (m.strGross - m.ltGross) / m.ltGross * 100 : 0;
-  const breakevenOcc = m.occ ? (m.occ * (m.ltNet / m.strNet)) * 100 : 0;
+  /* Breakeven only means something when both nets are positive. With a
+     negative STR net the ratio flips sign and returns a plausible-looking
+     percentage for a case that never breaks even at any occupancy. */
+  const beValid = m.occ > 0 && m.strNet > 0 && m.ltNet > 0;
+  const breakevenOcc = beValid ? m.occ * (m.ltNet / m.strNet) * 100 : null;
 
   const head = document.getElementById('v-head');
   const body = document.getElementById('v-body');
@@ -221,7 +224,9 @@ function renderSTR(){
     head.innerHTML = `STR clears long-term by <em>${A(delta)}</em> net`;
     body.textContent =
       `Gross revenue runs ${grossSpread.toFixed(0)}% above the contract rent, and ${(100 - (m.strNet/m.strGross*100)).toFixed(0)}% of that gross is consumed by operating friction. ` +
-      `The arbitrage survives at this occupancy. It reverses below roughly ${Math.max(0, breakevenOcc).toFixed(0)}% — model the trough, not the peak.`;
+      (breakevenOcc !== null && breakevenOcc < 100
+        ? `The arbitrage survives at this occupancy. It reverses below roughly ${breakevenOcc.toFixed(0)}% — model the trough, not the peak.`
+        : `Model the trough, not the peak.`);
   } else {
     head.innerHTML = `Long-term clears STR by <em>${A(Math.abs(delta))}</em> net`;
     body.textContent =
@@ -238,27 +243,31 @@ document.querySelectorAll('.mode-b').forEach(b=>{
     renderSTR();
   });
 });
-['T-price','T-size','T-sc','T-rent','T-adr','T-occ','T-op','T-furn']
+['T-price','T-size','T-sc','T-rent','T-adr','T-occ','T-op','T-furn','T-trough','T-tourism','T-permit','T-util','T-amort']
   .forEach(id=>{ const el = document.getElementById(id); if(el) el.addEventListener('input', renderSTR); });
 renderSTR();
 
 /* ═══════════════ TOOLS — ROI ═══════════════ */
 const fmt = n => 'AED ' + Math.round(n).toLocaleString('en-US');
+/* Same definition as the Lab and the STR long-let arm — vacancy,
+   service charge, management and maintenance all deducted. This panel
+   previously subtracted the service charge alone and reported the result
+   as "net yield", which read materially higher than the Lab for the same
+   property with no explanation offered. */
 function calcROI(){
-  const P = +document.getElementById('r-price').value || 0;
-  const R = +document.getElementById('r-rent').value || 0;
-  const S = +document.getElementById('r-sc').value || 0;
-  const A = +document.getElementById('r-app').value;
+  const P = val('r-price'), R = val('r-rent'), S = val('r-sc'), A = val('r-app');
   document.getElementById('r-app-v').textContent = A.toFixed(1);
-  if(P<=0){ return; }
-  const gross = R/P*100, net = (R-S)/P*100, monthly = (R-S)/12;
-  const v5 = P*Math.pow(1+A/100,5);
-  const total = ((v5-P) + (R-S)*5)/P*100;
-  document.getElementById('r-gross').textContent = gross.toFixed(2)+'%';
-  document.getElementById('r-net').textContent = net.toFixed(2)+'%';
-  document.getElementById('r-monthly').textContent = fmt(monthly);
-  document.getElementById('r-5y').textContent = fmt(v5);
-  document.getElementById('r-total').textContent = '+'+total.toFixed(1)+'%';
+  if(P<=0) return;
+
+  const op  = F.noi({ rent:R, serviceCharge:S });   /* shared assumptions */
+  const v5  = P * Math.pow(1 + A/100, 5);
+  const total = ((v5 - P) + op.total * 5) / P * 100;
+
+  document.getElementById('r-gross').textContent   = F.grossYield(R,P).toFixed(2)+'%';
+  document.getElementById('r-net').textContent     = (op.total / P * 100).toFixed(2)+'%';
+  document.getElementById('r-monthly').textContent = fmt(op.total/12);
+  document.getElementById('r-5y').textContent      = fmt(v5);
+  document.getElementById('r-total').textContent   = (total>=0?'+':'')+total.toFixed(1)+'%';
 }
 ['r-price','r-rent','r-sc','r-app'].forEach(id=> document.getElementById(id).addEventListener('input', calcROI));
 calcROI();
@@ -283,8 +292,10 @@ function calcVisa(){
 calcVisa();
 
 /* ═══════════════ TOOLS — FX (USD peg exact; EUR/GBP indicative) ═══════════════ */
-/* AED per unit. USD is the fixed UAE peg. EUR and GBP start from last
-   verified values and are replaced by ECB-derived rates on load. */
+/* AED per unit. USD is the fixed UAE Central Bank peg and does not move.
+   EUR and GBP are fallbacks only, last verified 8 Aug 2026, and are
+   replaced by ECB-derived rates on load. If /api/fx fails these stand,
+   which is why the label reads "verified" rather than "live". */
 let RATES = { USD:3.6725, EUR:4.2373, GBP:4.9495 };
 function calcFX(){
   const amt = +document.getElementById('fx-amt').value || 0;

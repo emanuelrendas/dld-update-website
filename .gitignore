@@ -9,6 +9,11 @@ data/raw/*
 data/manifest.json
 data/inspection-report.txt
 
+# Internal audit and planning notes. Vercel serves this repository
+# statically, so anything committed under data/ would be readable at
+# /data/<name>. These are working documents, not published research.
+data/*.md
+
 # No spreadsheet or archive is ever committed.
 *.csv
 *.xlsx
