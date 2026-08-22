@@ -6,7 +6,7 @@
 
 /* ═══════════════ CONFIG ═══════════════ */
 const WA = "971543871702";
-const MAIL = "emanuel@agassetsrealestate.ae";
+const MAIL = "privateadvisory@emanuelrendas.com";
 const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const noHover = window.matchMedia('(hover: none)').matches;
 

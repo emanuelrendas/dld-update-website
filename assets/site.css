@@ -21,11 +21,18 @@ button{font-family:inherit;}
 .label{font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--champagne);font-weight:600;}
 
 /* reveals */
-.rv{opacity:0;transform:translateY(28px);transition:opacity 1s var(--ease),transform 1s var(--ease);}
+/* Content is visible by default and only hidden when there is JavaScript
+   present to reveal it again. The reveal is driven by an IntersectionObserver,
+   so hiding unconditionally meant a failed or blocked script left the body of
+   every page blank — hero and footer with nothing between them. An inline
+   script in <head> stamps .js on <html> before the first paint, so the
+   animation is unchanged for anyone with a working browser and the content
+   simply stays put for everyone else. */
+.js .rv{opacity:0;transform:translateY(28px);transition:opacity 1s var(--ease),transform 1s var(--ease);}
 .rv.in{opacity:1;transform:none;}
 .rv-d1{transition-delay:.12s;} .rv-d2{transition-delay:.24s;} .rv-d3{transition-delay:.36s;}
 @media(prefers-reduced-motion:reduce){
-  .rv{opacity:1;transform:none;transition:none;}
+  .js .rv{opacity:1;transform:none;transition:none;}
   *{animation-duration:0.01ms!important;animation-iteration-count:1!important;transition-duration:0.01ms!important;}
 }
 
