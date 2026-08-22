@@ -5,6 +5,11 @@ data/raw/*
 !data/raw/.gitkeep
 data/manifest.json
 
+# Internal audit and planning notes. Vercel serves this repository
+# statically, so anything committed under data/ would be readable at
+# /data/<name>. These are working documents, not published research.
+data/*.md
+
 # no spreadsheet or archive is ever committed
 *.csv
 *.xlsx
