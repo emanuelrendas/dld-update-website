@@ -28,6 +28,8 @@ export default async function handler(req, res) {
   // ECB publishes daily. A 6-hour edge cache keeps us current without
   // hammering a free public endpoint.
   res.setHeader('Cache-Control', 's-maxage=21600, stale-while-revalidate=86400');
+  // Ensure the response is identified as JSON for local tooling and tests.
+  res.setHeader('Content-Type', 'application/json');
 
   try {
     const r = await fetch('https://api.frankfurter.app/latest?from=EUR&to=USD,GBP', {
