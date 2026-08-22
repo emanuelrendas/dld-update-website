@@ -60,4 +60,4 @@ User-agent: CCBot
 Allow: /
 Disallow: /api/
 
-Sitemap: https://professional-website-real-estate.vercel.app/sitemap.xml
+Sitemap: https://www.emanuelrendas.com/sitemap.xml
