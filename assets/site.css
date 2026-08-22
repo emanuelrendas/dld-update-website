@@ -1,10 +1,62 @@
 /* ═══════════════ TOKENS ═══════════════ */
+/* ═══════════════════════════════════════════════════════════════════
+   DESIGN TOKENS
+
+   Ink and graphite ground, warm off-white type, brass as an accent and
+   never as a field. The brass was previously doing three jobs at once —
+   text, rules and background washes — which is what made the site read
+   as luxury marketing rather than analysis. Here it marks one thing at a
+   time: the active state, the eyebrow, a single hairline.
+
+   Contrast, measured against --coal (#0E0F12):
+     --ivory   #F5F1E8   15.8:1   body and headings        AAA
+     --smoke   #8B8578    6.1:1   secondary and captions   AA
+     --champ-hi #DCC79A  11.4:1   accent text on ink       AAA
+   --champagne (#C4A265, 8.6:1) is reserved for rules, marks and small
+   accents rather than running text.
+   ═══════════════════════════════════════════════════════════════════ */
 :root{
+  /* ground + ink */
   --void:#050608; --coal:#0E0F12; --graphite:#17181C;
+  --ivory:#F5F1E8; --smoke:#8B8578;
+
+  /* accent — small surfaces only */
   --champagne:#C4A265; --champ-hi:#DCC79A; --champ-dim:rgba(196,162,101,0.22);
-  --ivory:#F5F1E8; --smoke:#8B8578; --line:rgba(196,162,101,0.16);
   --emerald:#1A6B4A;
+
+  /* borders: neutral by default, brass only where something is active */
+  --line:rgba(245,241,232,0.10);
+  --line-strong:rgba(245,241,232,0.18);
+  --line-accent:rgba(196,162,101,0.34);
+
+  /* spacing — one scale, no arbitrary values */
+  --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px;
+  --s6:32px; --s7:48px; --s8:64px; --s9:96px; --s10:128px;
+
+  /* radius — near-square. Rounded corners read as consumer software */
+  --r-sm:2px; --r-md:3px; --r-lg:4px;
+
+  /* type scale */
+  --t-micro:11px; --t-cap:12.5px; --t-sm:14px; --t-body:16px;
+  --t-lg:19px; --t-xl:24px; --t-2xl:32px; --t-3xl:44px;
+  --lh-tight:1.14; --lh-snug:1.35; --lh-body:1.68;
+  --track-label:.19em;
+
+  /* motion */
   --ease:cubic-bezier(0.22,1,0.36,1);
+  --dur-fast:140ms; --dur:240ms; --dur-slow:600ms;
+
+  /* focus — visible on ink, never removed */
+  --focus:var(--champ-hi);
+  --focus-ring:0 0 0 2px var(--coal), 0 0 0 4px var(--champ-hi);
+}
+
+/* One focus treatment for everything that takes keyboard focus. Previously
+   several components defined their own and two defined none. */
+a:focus-visible, button:focus-visible, input:focus-visible,
+select:focus-visible, textarea:focus-visible, [tabindex]:focus-visible,
+summary:focus-visible{
+  outline:none; box-shadow:var(--focus-ring); border-radius:var(--r-sm);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html{scroll-behavior:smooth;}
@@ -80,30 +132,33 @@ nav.solid{height:74px;background:rgba(5,6,8,0.92);backdrop-filter:blur(18px) sat
 }
 
 /* ═══════════════ HERO ═══════════════ */
-.hero{position:relative;min-height:clamp(560px,76vh,820px);display:grid;grid-template-rows:1fr auto;overflow:hidden;}
-#dust{position:absolute;inset:0;z-index:1;}
-#skyline{position:absolute;left:0;right:0;bottom:-2px;z-index:2;width:100%;height:clamp(190px,32vh,300px);pointer-events:none;}
-.hero-glow{position:absolute;bottom:-10vh;left:50%;transform:translateX(-50%);width:120vw;height:50vh;background:radial-gradient(ellipse at center bottom,rgba(196,162,101,0.13),transparent 65%);z-index:1;pointer-events:none;}
+.hero{position:relative;min-height:clamp(470px,60vh,660px);display:grid;grid-template-rows:1fr auto;overflow:hidden;}
 .hero-in{position:relative;z-index:5;grid-row:1;align-self:center;padding-top:104px;padding-bottom:40px;}
 .hero-eyebrow{margin-bottom:22px;display:flex;align-items:center;gap:16px;}
 .hero-eyebrow .rule{width:52px;height:1px;background:var(--champagne);}
 .hero h1{font-family:'Cormorant Garamond',serif;font-weight:400;font-size:clamp(44px,7.4vw,92px);line-height:1.04;letter-spacing:-0.5px;}
-.hero h1 .l{display:inline-block;opacity:0;transform:translateY(0.55em) rotate(2deg);transition:opacity .7s var(--ease),transform .7s var(--ease);}
-.hero h1 .l.on{opacity:1;transform:none;}
+.hero h1 .row1,.hero h1 .row2{display:inline-block;opacity:0;transform:translateY(12px);
+  transition:opacity var(--dur-slow) var(--ease),transform var(--dur-slow) var(--ease);}
+.hero h1 .row1.on,.hero h1 .row2.on{opacity:1;transform:none;}
 .hero h1 .row2{font-style:italic;color:var(--champ-hi);}
-.hero-sub{color:var(--smoke);font-size:16px;max-width:520px;margin:26px 0 34px;opacity:0;transition:opacity 1s var(--ease) .9s;}
+.hero-sub{color:var(--smoke);font-size:var(--t-body);line-height:var(--lh-body);max-width:56ch;margin:var(--s5) 0 var(--s6);opacity:0;transition:opacity var(--dur) var(--ease) .12s;}
 .hero-sub.on{opacity:1;}
-.hero-ctas{display:flex;gap:16px;flex-wrap:wrap;opacity:0;transition:opacity 1s var(--ease) 1.15s;}
+.hero-ctas{display:flex;gap:var(--s3);flex-wrap:wrap;opacity:0;transition:opacity var(--dur) var(--ease) .2s;}
 .hero-ctas.on{opacity:1;}
 .btn{display:inline-flex;align-items:center;gap:10px;padding:17px 32px;font-size:11px;letter-spacing:2.5px;font-weight:600;text-transform:uppercase;cursor:pointer;border:1px solid transparent;position:relative;overflow:hidden;transition:transform .25s var(--ease),background .3s,color .3s,border-color .3s;will-change:transform;}
-.btn-solid{background:var(--champagne);color:var(--void);}
+/* Primary action. Brass marks it rather than fills it — a solid gold
+   block at full mobile width was the single largest field of accent
+   colour on the site, which is the thing that read as marketing. */
+.btn-solid{background:rgba(196,162,101,0.14);color:var(--ivory);
+  border:1px solid var(--line-accent);box-shadow:inset 2px 0 0 var(--champagne);}
+.btn-solid:hover{background:rgba(196,162,101,0.22);border-color:var(--champagne);}
 .btn-solid::before{content:"";position:absolute;top:0;left:-80%;width:60%;height:100%;background:linear-gradient(105deg,transparent,rgba(255,255,255,0.35),transparent);transform:skewX(-20deg);transition:left .6s var(--ease);}
 .btn-solid:hover::before{left:120%;}
 .btn-solid:hover{background:var(--champ-hi);}
 .btn-line{border-color:var(--champ-dim);color:var(--champ-hi);}
 .btn-line:hover{border-color:var(--champagne);background:rgba(196,162,101,0.06);}
 .hero-meta{position:relative;z-index:6;grid-row:2;padding-bottom:28px;}
-.hero-meta .wrap{display:flex;justify-content:space-between;align-items:center;gap:20px 28px;flex-wrap:wrap;padding-top:22px;border-top:1px solid rgba(196,162,101,0.10);}
+.hero-meta .wrap{display:block;padding-top:22px;border-top:1px solid var(--line);}
 .hero-meta .hm{font-size:9.5px;letter-spacing:3px;color:var(--smoke);text-transform:uppercase;}
 .scroll-cue{width:1px;height:44px;background:linear-gradient(var(--champagne),transparent);position:relative;overflow:hidden;}
 .scroll-cue::after{content:"";position:absolute;top:-40%;left:0;width:100%;height:40%;background:var(--champ-hi);animation:cue 2.2s var(--ease) infinite;}
@@ -431,7 +486,7 @@ footer{border-top:1px solid var(--line);padding:64px 0 38px;background:var(--voi
 .ins-c h3{font-size:12.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;}
 .ins-c p{font-size:13px;color:var(--smoke);}
 @media(max-width:760px){
-  .hero-meta .wrap{justify-content:center;text-align:center;gap:10px;}
+  .hero-meta .wrap{text-align:left;}
   .hero-meta .scroll-cue{display:none;}
   .hero-ctas .btn{width:100%;justify-content:center;}
   section{padding:64px 0;}
@@ -922,7 +977,7 @@ footer{view-transition-name:site-footer;}
   .hero-sub{font-size:16px;}
   .hero-ctas{flex-direction:column;align-items:stretch;}
   .hero-ctas .btn{justify-content:center;width:100%;}
-  .hero-meta .wrap{justify-content:center;text-align:center;}
+  .hero-meta .wrap{text-align:left;}
   .hero-meta .scroll-cue{display:none;}
   .explore-c{min-height:0;padding:30px 26px 28px;}
   .brief-fb .fb-act .btn{min-width:100%;}
@@ -1025,7 +1080,7 @@ footer{view-transition-name:site-footer;}
   @page{margin:16mm 14mm;}
   html,body{background:#fff!important;color:#111!important;font-size:11pt;}
   #nav,#wa,#progress,#loader,#cur-dot,#cur-ring,footer,.skip,.marquee,
-  .share-bar,.tool-tabs,.tt,.cmp-bar,#dust,#skyline,.hero-glow,.scroll-cue{display:none!important;}
+  .share-bar,.tool-tabs,.tt,.cmp-bar,.scroll-cue{display:none!important;}
   .tool-panel:not(.on){display:none!important;}
   main,section,.wrap{padding:0!important;margin:0!important;max-width:none!important;}
   section{border:0!important;background:#fff!important;}
@@ -1065,4 +1120,103 @@ body:not(:has(.hero)) main > :first-child{padding-top:118px!important;}
 @media (max-width:700px){
   body:not(:has(.hero)) nav{height:70px;}
   body:not(:has(.hero)) main > :first-child{padding-top:104px!important;}
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   PHASE 2 — PROVENANCE STRIP AND DECISION PATHS
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ─────────── hero provenance ───────────
+   Three positions on method, sitting where a skyline and a particle
+   canvas used to. None of them is a market statistic: they are the rules
+   the rest of the site is governed by, which is the one thing that can
+   be stated in a hero without a source line under it. */
+.prov{
+  display:grid; grid-template-columns:repeat(3,1fr);
+  gap:0; margin:0; padding:0;
+  border-top:1px solid var(--line);
+}
+.prov-i{
+  padding:var(--s5) var(--s5) var(--s5) 0;
+  border-right:1px solid var(--line);
+}
+.prov-i:last-child{ border-right:0; }
+.prov-i + .prov-i{ padding-left:var(--s5); }
+.prov dt{
+  font-size:var(--t-micro); letter-spacing:var(--track-label);
+  text-transform:uppercase; color:var(--champagne);
+  margin:0 0 var(--s2);
+}
+.prov dd{
+  margin:0 0 var(--s2);
+  font-family:'Cormorant Garamond',Georgia,serif;
+  font-size:var(--t-xl); line-height:var(--lh-tight); color:var(--ivory);
+  font-weight:400;
+}
+.prov p{
+  margin:0; font-size:var(--t-cap); line-height:var(--lh-snug);
+  color:var(--smoke); max-width:34ch;
+}
+
+/* ─────────── decision paths ───────────
+   A list, not a grid of cards. Each row carries the question that brings
+   someone here, then what answers it. Four equal boxes made four
+   destinations look interchangeable; a list with one rule between rows
+   makes them read as alternatives to choose between. */
+.paths{ list-style:none; margin:0; padding:0; border-top:1px solid var(--line); }
+.path{ border-bottom:1px solid var(--line); }
+.path > a{
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  align-items:start; gap:var(--s6);
+  padding:var(--s6) var(--s3);
+  text-decoration:none; color:inherit;
+  transition:background var(--dur) var(--ease);
+}
+.path > a:hover{ background:rgba(245,241,232,0.028); }
+.path > a:focus-visible{ box-shadow:var(--focus-ring); border-radius:var(--r-md); }
+.p-n{
+  font-size:var(--t-micro); letter-spacing:.14em; color:var(--champagne);
+  padding-top:8px; font-variant-numeric:tabular-nums;
+}
+.p-b{ display:block; }
+.p-q{
+  display:block; font-size:var(--t-cap); color:var(--smoke);
+  margin-bottom:var(--s2);
+}
+.p-t{
+  display:block; font-family:'Cormorant Garamond',Georgia,serif;
+  font-size:var(--t-2xl); line-height:var(--lh-tight); color:var(--ivory);
+  margin-bottom:var(--s3); transition:color var(--dur) var(--ease);
+}
+.path > a:hover .p-t{ color:var(--champ-hi); }
+.p-d{
+  display:block; font-size:var(--t-sm); line-height:var(--lh-body);
+  color:var(--smoke); max-width:62ch;
+}
+.p-go{
+  color:var(--champagne); font-size:var(--t-lg); padding-top:6px;
+  transition:transform var(--dur) var(--ease);
+}
+.path > a:hover .p-go{ transform:translateX(5px); }
+
+/* Practice line under the copyright, now that no company name sits there */
+.ft-practice{ color:var(--smoke); }
+
+@media (max-width:860px){
+  .prov{ grid-template-columns:1fr; border-top:0; }
+  .prov-i{
+    border-right:0; border-top:1px solid var(--line);
+    padding:var(--s4) 0;
+  }
+  .prov-i + .prov-i{ padding-left:0; }
+  .prov dd{ font-size:var(--t-lg); }
+  .path > a{ grid-template-columns:auto 1fr; gap:var(--s4); padding:var(--s5) 0; }
+  .p-go{ display:none; }
+  .p-t{ font-size:var(--t-xl); }
+}
+
+@media (prefers-reduced-motion:reduce){
+  .path > a, .p-t, .p-go{ transition:none; }
+  .path > a:hover .p-go{ transform:none; }
 }
