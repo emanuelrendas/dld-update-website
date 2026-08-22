@@ -152,9 +152,6 @@ nav.solid{height:74px;background:rgba(5,6,8,0.92);backdrop-filter:blur(18px) sat
 .btn-solid{background:rgba(196,162,101,0.14);color:var(--ivory);
   border:1px solid var(--line-accent);box-shadow:inset 2px 0 0 var(--champagne);}
 .btn-solid:hover{background:rgba(196,162,101,0.22);border-color:var(--champagne);}
-.btn-solid::before{content:"";position:absolute;top:0;left:-80%;width:60%;height:100%;background:linear-gradient(105deg,transparent,rgba(255,255,255,0.35),transparent);transform:skewX(-20deg);transition:left .6s var(--ease);}
-.btn-solid:hover::before{left:120%;}
-.btn-solid:hover{background:var(--champ-hi);}
 .btn-line{border-color:var(--champ-dim);color:var(--champ-hi);}
 .btn-line:hover{border-color:var(--champagne);background:rgba(196,162,101,0.06);}
 .hero-meta{position:relative;z-index:6;grid-row:2;padding-bottom:28px;}
@@ -1176,7 +1173,7 @@ body:not(:has(.hero)) main > :first-child{padding-top:118px!important;}
   .hero h1 { font-size: clamp(50px,6.6vw,88px); line-height: 1.06; letter-spacing: 0; }
   .hero-sub { color: #B9B2A4; font-size: 17px; line-height: 1.68; max-width: 60ch; }
   .btn { font-size: 12px; letter-spacing: 2px; }
-  .btn-solid::before, .addr-c::before { display: none; }
+  .addr-c::before { display: none; }
   .scroll-cue { background: var(--line-accent); }
   section { padding-block: 112px; }
   .path > a { grid-template-columns: 72px minmax(0,1fr) 32px; gap: var(--s7); padding: 36px 0; }
