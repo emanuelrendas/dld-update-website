@@ -12,7 +12,7 @@
 //
 // Source: api.frankfurter.app — ECB reference rates, free, no key required.
 // ECB publishes once per working day around 16:00 CET.
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
 
 const AED_PER_USD = 3.6725;   // UAE Central Bank peg — fixed, not a market rate
 

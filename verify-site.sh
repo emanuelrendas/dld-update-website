@@ -43,7 +43,10 @@ dld_resp=$(curl -sS "$BASE/api/dld" || { echo "  ERROR: curl failed for /api/dld
 if ! echo "$dld_resp" | jq . >/dev/null 2>&1; then
   echo "  FAIL: /api/dld returned invalid JSON"; echo "$dld_resp"; exit 6
 fi
-configured=$(echo "$dld_resp" | jq -r '.configured // "MISSING"')
+# jq's // operator treats a present-but-false value as empty, so
+# '.configured // "MISSING"' reports MISSING for a correct configured:false
+# response — the exact case this check exists to distinguish.
+configured=$(echo "$dld_resp" | jq -r 'if has("configured") then (.configured|tostring) else "MISSING" end')
 echo "  configured: $configured"
 if [[ "$configured" == "MISSING" ]]; then
   echo "  WARN: 'configured' key missing from /api/dld response"
