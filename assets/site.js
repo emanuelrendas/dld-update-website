@@ -19,91 +19,29 @@ const noHover = window.matchMedia('(hover: none)').matches;
   const seen = sessionStorage.getItem('er-seen');
   if(seen){ loader.remove(); document.body.classList.add('ready'); startHero(0); return; }
   window.addEventListener('load', ()=>{
-    setTimeout(()=>{ loader.classList.add('gone'); document.body.classList.add('ready'); }, 700);
-    setTimeout(()=> startHero(), 850);
+    setTimeout(()=>{ loader.classList.add('gone'); document.body.classList.add('ready'); }, 320);
+    setTimeout(()=> startHero(), 400);
     sessionStorage.setItem('er-seen','1');
   });
 })();
 
-/* ═══════════════ HERO LETTER REVEAL ═══════════════
-   Each word is wrapped as an inline-block unit so the browser
-   can still break lines between words — splitting into bare
-   letters used to hyphenate mid-word on narrow screens. */
-function splitRow(el){
-  const text = el.dataset.text || el.textContent;
-  el.innerHTML = '';
-  text.split(' ').forEach((word, wi, arr)=>{
-    const w = document.createElement('span');
-    w.className = 'w';
-    [...word].forEach(ch=>{
-      const s = document.createElement('span');
-      s.className = 'l';
-      s.textContent = ch;
-      w.appendChild(s);
-    });
-    el.appendChild(w);
-    if(wi < arr.length - 1) el.appendChild(document.createTextNode(' '));
-  });
-}
+/* The headline used to animate letter by letter — 22ms apart, 0.7s each,
+   behind a 1.55s loader, with the call to action delayed a further 1.15s
+   on top. The primary action was not readable for over two seconds.
+   A hero that performs for two seconds before it can be read is not calm,
+   whatever it looks like in a still.
+
+   Each line now fades as a unit, 90ms apart, and the whole sequence is
+   done inside 400ms. The per-letter splitter, the particle canvas and the
+   magnetic-button handler went with it — nothing references them now. */
 function startHero(step){
   const rows = document.querySelectorAll('.row1, .row2');
   if(!rows.length) return;
-  const gap = step === 0 ? 0 : 22;
-  const all = [...document.querySelectorAll('.row1 .l, .row2 .l')];
-  all.forEach((s,i)=> gap ? setTimeout(()=> s.classList.add('on'), i*gap) : s.classList.add('on'));
+  const gap = step === 0 ? 0 : 90;
+  rows.forEach((r,i)=> gap ? setTimeout(()=> r.classList.add('on'), i*gap) : r.classList.add('on'));
   document.getElementById('hero-sub')?.classList.add('on');
   document.getElementById('hero-ctas')?.classList.add('on');
 }
-(function(){
-  const r1 = document.querySelector('.row1'), r2 = document.querySelector('.row2');
-  if(r1) splitRow(r1);
-  if(r2) splitRow(r2);
-})();
-
-/* ═══════════════ CHAMPAGNE DUST (canvas) ═══════════════ */
-(function(){
-  const cv = document.getElementById('dust');
-  if(!cv) return;
-  const cx = cv.getContext('2d');
-  let W,H,parts=[],mx=0.5,my=0.5;
-  function sizeCanvas(){
-    W = cv.width = cv.offsetWidth * devicePixelRatio;
-    H = cv.height = cv.offsetHeight * devicePixelRatio;
-  }
-  function makeParts(){
-    const n = window.innerWidth < 700 ? 34 : 64;
-    parts = Array.from({length:n},()=>({
-      x:Math.random(), y:Math.random(),
-      r:(Math.random()*1.6+0.5)*devicePixelRatio,
-      vy:-(Math.random()*0.00022+0.00006),
-      vx:(Math.random()-0.5)*0.00012,
-      o:Math.random()*0.5+0.15,
-      p:Math.random()*0.6+0.4      /* parallax depth */
-    }));
-  }
-  function tick(){
-    cx.clearRect(0,0,W,H);
-    const ox=(mx-0.5)*40*devicePixelRatio, oy=(my-0.5)*26*devicePixelRatio;
-    for(const p of parts){
-      p.y += p.vy; p.x += p.vx;
-      if(p.y < -0.05){ p.y = 1.05; p.x = Math.random(); }
-      if(p.x < -0.05) p.x = 1.05; if(p.x > 1.05) p.x = -0.05;
-      cx.beginPath();
-      cx.arc(p.x*W + ox*p.p, p.y*H + oy*p.p, p.r, 0, 6.283);
-      cx.fillStyle = `rgba(196,162,101,${p.o})`;
-      cx.fill();
-    }
-    if(!reduced) requestAnimationFrame(tick);
-  }
-  sizeCanvas(); makeParts();
-  if(reduced){ tick(); } else { requestAnimationFrame(tick); }
-  window.addEventListener('resize', ()=>{ sizeCanvas(); makeParts(); }, {passive:true});
-  window.addEventListener('mousemove', e=>{
-    mx = e.clientX / window.innerWidth; my = e.clientY / window.innerHeight;
-    const sk = document.getElementById('skyline');
-    if(sk && !reduced) sk.style.transform = `translateX(${(mx-0.5)*-18}px)`;
-  }, {passive:true});
-})();
 
 /* ═══════════════ CURSOR ═══════════════ */
 (function(){
@@ -120,18 +58,6 @@ function startHero(step){
     if(e.target.closest('a,button,.qo,.tt,.faq-q,.map-pin,input,select,textarea')) ring.classList.remove('hot');
   });
 })();
-
-/* ═══════════════ MAGNETIC BUTTONS ═══════════════ */
-if(!noHover && !reduced){
-  document.querySelectorAll('.magnetic').forEach(btn=>{
-    btn.addEventListener('mousemove', e=>{
-      const r = btn.getBoundingClientRect();
-      const dx = e.clientX - (r.left + r.width/2), dy = e.clientY - (r.top + r.height/2);
-      btn.style.transform = `translate(${dx*0.10}px, ${dy*0.14}px)`;
-    });
-    btn.addEventListener('mouseleave', ()=> btn.style.transform = '');
-  });
-}
 
 /* ═══════════════ NAV + PROGRESS ═══════════════ */
 const nav = document.getElementById('nav');
