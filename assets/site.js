@@ -1,3 +1,21 @@
+/* ═══════════════════════════════════════════════════════════════════
+   ⚠  BUMP THE VERSION WHEN YOU EDIT THIS FILE
+
+   vercel.json caches /assets/* for one year with `immutable`, which
+   tells browsers never to revalidate — not on reload, not on a hard
+   refresh. The filename carries no content hash, so the only thing that
+   makes a returning visitor fetch a new copy is a different URL.
+
+   Every page references this file as:
+
+       /assets/site.js?v=20260822
+
+   Change the file, change that stamp in all seven HTML pages, or the
+   change is invisible to everyone who has already visited. It is not a
+   deployment problem and it will not look like one: the HTML updates
+   normally while the CSS and JavaScript stay frozen, which reads as a
+   half-broken site rather than a cache.
+   ═══════════════════════════════════════════════════════════════════ */
 /* ═══════════════════════════════════════════════════════════
    SHARED CHROME — loads on every page
    Every module guards its own root element, so a page that
