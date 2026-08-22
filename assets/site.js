@@ -257,11 +257,54 @@ document.querySelectorAll('.src').forEach(el=>{
 });
 document.addEventListener('click', ()=> document.querySelectorAll('.src.open').forEach(x=>x.classList.remove('open')));
 
-/* ═══════════════ BRIEF FORM → WHATSAPP (with mail fallback) ═══════════════
-   The brief opens WhatsApp on the visitor's own device — nothing is
-   stored here. Pop-up blockers and desktops without WhatsApp used to
-   swallow the lead silently; the fallback panel now offers the same
-   brief as a mailto and as copyable text. */
+/* ═══════════════ FUNNEL EVENTS ═══════════════
+   A session id that lives only for this tab, and a small set of named
+   events. Nothing here identifies a person; the server refuses any event
+   name and any property it does not already know about.
+
+   Failure is silent on purpose. Telemetry that breaks a page is worse
+   than telemetry that is missing. */
+window.Track = (function(){
+  let sid = null;
+  try {
+    sid = sessionStorage.getItem('er_sid');
+    if(!sid){
+      sid = (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(36).slice(2));
+      sessionStorage.setItem('er_sid', sid);
+    }
+  } catch { /* private mode, storage disabled — events simply stop */ }
+
+  return function track(event_name, event_props){
+    if(!sid) return;
+    try {
+      fetch('/api/event', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        /* pathname only, never location.href. The instruments page
+           serialises the visitor's own figures into the query string so a
+           model can be shared by link — sending the full URL would carry
+           their purchase price out of the browser on every event. */
+        body: JSON.stringify({ session_id: sid, event_name, event_props: event_props || null, page_url: location.pathname }),
+        keepalive: true,
+      }).catch(()=>{});
+    } catch { /* never let this surface */ }
+  };
+})();
+
+/* ═══════════════ BRIEF FORM → STORED, THEN WHATSAPP ═══════════════
+   The brief used to open WhatsApp and keep no record, so anyone who
+   hesitated at the handoff — pop-up blocked, no WhatsApp on the device,
+   or simply a change of mind — vanished without trace.
+
+   Now it is stored first. Two details matter in the ordering below:
+
+   · WhatsApp is opened SYNCHRONOUSLY, before any await. A pop-up opened
+     after an await has lost the user-gesture context and blockers kill
+     it. The visitor's experience is unchanged and instant.
+
+   · Storage failing does not block the handoff, and the handoff failing
+     does not block storage. They are independent paths to the same lead,
+     which is the entire point — either one alone still reaches me. */
 (function(){
   const form = document.getElementById('brief-form');
   if(!form) return;
@@ -269,6 +312,7 @@ document.addEventListener('click', ()=> document.querySelectorAll('.src.open').f
   const compose = ()=>
     "PRIVATE BRIEF — via website\n" +
     "Name: " + (val('b-name') || "—") + "\n" +
+    "Email: " + (val('b-email') || "—") + "\n" +
     "Based in: " + (val('b-base') || "—") + "\n" +
     "Interest: " + val('b-int') + "\n" +
     "Budget: " + val('b-bud') + "\n" +
@@ -277,7 +321,50 @@ document.addEventListener('click', ()=> document.querySelectorAll('.src.open').f
   form.addEventListener('submit', function(e){
     e.preventDefault();
     const msg = compose();
+
+    /* First, and synchronously — see the note above. */
     const win = window.open("https://wa.me/" + WA + "?text=" + encodeURIComponent(msg), "_blank");
+    window.Track && window.Track('whatsapp_clicked', { budget_band: val('b-bud'), objective: val('b-int') });
+
+    const note = document.getElementById('brief-stored');
+    const q = new URLSearchParams(location.search);
+
+    fetch('/api/lead', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      keepalive: true,
+      body: JSON.stringify({
+        name:  val('b-name'),
+        email: val('b-email'),
+        address: val('b-base'),
+        investment_objective: val('b-int'),
+        budget_band: val('b-bud'),
+        notes: val('b-msg'),
+        preferred_language: (document.documentElement.lang || 'en').slice(0,2),
+        referrer_url: document.referrer || null,
+        utm_source: q.get('utm_source'), utm_medium: q.get('utm_medium'), utm_campaign: q.get('utm_campaign'),
+      }),
+    })
+    .then(r => r.json().catch(()=>({ ok:false })))
+    .then(d => {
+      window.Track && window.Track('form_submitted', { stored: !!(d && d.ok), budget_band: val('b-bud') });
+      if(note){
+        note.hidden = false;
+        note.textContent = (d && d.ok)
+          ? 'Your brief has reached me. I respond within one business day.'
+          : 'Your brief did not save — please send it on WhatsApp, or by email below.';
+        note.classList.toggle('warn', !(d && d.ok));
+      }
+    })
+    .catch(()=>{
+      window.Track && window.Track('form_submitted', { stored: false });
+      if(note){
+        note.hidden = false;
+        note.textContent = 'Your brief did not save — please send it on WhatsApp, or by email below.';
+        note.classList.add('warn');
+      }
+    });
+
     const fb = document.getElementById('brief-fallback');
     if(fb){
       const mail = document.getElementById('brief-mail');
