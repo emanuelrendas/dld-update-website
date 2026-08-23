@@ -8,7 +8,7 @@
 
    Every page references this file as:
 
-       /assets/site.css?v=20260823b
+       /assets/site.css?v=20260823c
 
    Change the file, change that stamp in all seven HTML pages, or the
    change is invisible to everyone who has already visited. It is not a
@@ -1318,3 +1318,6 @@ body:not(:has(.hero)) main > :first-child{padding-top:118px!important;}
 @media (prefers-reduced-motion:reduce){
   .d-pip,.d-opt{transition:none;}
 }
+.d-noscript{font-size:var(--t-sm);line-height:var(--lh-body);color:var(--ivory);
+  padding:var(--s5);border:1px solid var(--line-accent);background:rgba(196,162,101,.07);}
+.d-noscript a{color:var(--champ-hi);}

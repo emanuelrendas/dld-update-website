@@ -59,6 +59,8 @@ const TIERS = [
   [0,  'explorer'],
 ];
 
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 const CAPITAL   = new Set(['1M-2M', '2M-5M', '5M+']);
 const FOCUS     = new Set(['off_plan_appreciation', 'ready_ejari_yield']);
 const JURIS     = new Set(['PT', 'ES', 'UK', 'INTL']);
@@ -170,7 +172,7 @@ export default async function handler(req, res) {
 
     await post(URL_BASE, SERVICE, 'assessment_submissions', {
       lead_id: lead?.id ?? null,
-      session_id: clean(body.session_id, LIMITS.session_id) || 'unknown',
+      session_id: (() => { const v = clean(body.session_id, LIMITS.session_id); return v && UUID.test(v) ? v : 'unknown'; })(),
       capital_band, strategic_focus, tax_jurisdiction,
       name, email: email.toLowerCase(), whatsapp,
       consent, consent_at: new Date().toISOString(),
