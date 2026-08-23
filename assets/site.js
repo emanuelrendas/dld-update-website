@@ -8,7 +8,7 @@
 
    Every page references this file as:
 
-       /assets/site.js?v=20260823
+       /assets/site.js?v=20260823b
 
    Change the file, change that stamp in all seven HTML pages, or the
    change is invisible to everyone who has already visited. It is not a
@@ -24,6 +24,7 @@
 
 /* ═══════════════ CONFIG ═══════════════ */
 const WA = "971543871702";
+window.WA_NUMBER = WA;   /* dira.js builds its own deep links from this */
 const MAIL = "privateadvisory@emanuelrendas.com";
 const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const noHover = window.matchMedia('(hover: none)').matches;
