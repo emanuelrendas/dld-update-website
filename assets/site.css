@@ -8,7 +8,7 @@
 
    Every page references this file as:
 
-       /assets/site.css?v=20260822
+       /assets/site.css?v=20260823
 
    Change the file, change that stamp in all seven HTML pages, or the
    change is invisible to everyone who has already visited. It is not a
@@ -121,8 +121,26 @@ button{font-family:inherit;}
 
 /* ═══════════════ NAV ═══════════════ */
 #progress{position:fixed;top:0;left:0;height:2px;background:var(--champagne);width:0;z-index:110;}
-nav{position:fixed;top:0;left:0;right:0;z-index:100;height:96px;display:flex;align-items:center;transition:height .4s var(--ease),background .4s,box-shadow .4s;}
-nav.solid{height:74px;background:rgba(5,6,8,0.92);backdrop-filter:blur(18px) saturate(140%);-webkit-backdrop-filter:blur(18px) saturate(140%);box-shadow:0 1px 0 var(--line);}
+/* The bar's background and blur live on a pseudo-element, not on <nav>.
+
+   backdrop-filter makes an element a containing block for its
+   position:fixed descendants — so with the filter on <nav>, the mobile
+   menu panel (.nav-links, position:fixed; inset:0) sized itself to the
+   84px bar instead of the viewport. Its opaque background covered only
+   that strip while the links overflowed past it, rendering over the hero
+   with nothing behind them.
+
+   Moving the treatment to nav::before takes <nav> out of that role
+   entirely, so any fixed child positions against the viewport as
+   written. filter, transform, perspective, contain and will-change all
+   create the same trap; keeping them off <nav> keeps the menu working. */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;height:96px;display:flex;align-items:center;transition:height .4s var(--ease);}
+nav::before{content:"";position:absolute;inset:0;z-index:-1;
+  background:rgba(5,6,8,0.92);
+  backdrop-filter:blur(18px) saturate(140%);
+  -webkit-backdrop-filter:blur(18px) saturate(140%);
+  box-shadow:0 1px 0 var(--line);}
+nav.solid{height:74px;}
 .nav-in{display:flex;align-items:center;justify-content:space-between;gap:48px;width:100%;}
 .nav-brand{display:flex;align-items:baseline;gap:14px;flex-shrink:0;white-space:nowrap;}
 .nav-brand .mk{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:30px;color:var(--champagne);line-height:1;}
@@ -139,7 +157,7 @@ nav.solid{height:74px;background:rgba(5,6,8,0.92);backdrop-filter:blur(18px) sat
 #nav-tg{display:none;background:none;border:1px solid var(--line);color:var(--champagne);width:44px;height:44px;font-size:17px;cursor:pointer;z-index:130;transition:border-color .3s,background .3s;}
 #nav-tg:hover{border-color:var(--champagne);background:rgba(196,162,101,0.06);}
 @media(max-width:1080px){
-  .nav-links{position:fixed;inset:0;background:rgba(5,6,8,0.985);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);flex-direction:column;justify-content:center;align-items:center;gap:34px;transform:translateX(100%);transition:transform .5s var(--ease);padding:80px 32px;}
+  .nav-links{position:fixed;inset:0;background:var(--void);flex-direction:column;justify-content:center;align-items:center;gap:34px;transform:translateX(100%);transition:transform .5s var(--ease);padding:80px 32px;}
   .nav-links.open{transform:none;}
   .nav-links a{font-size:17px;letter-spacing:0.2em;padding:6px 0;}
   .nav-links a::after{left:50%;transform:translateX(-50%);}
@@ -1073,10 +1091,7 @@ footer{view-transition-name:site-footer;}
    else the content starts directly beneath it, so headings used to slide
    under a see-through bar during the first 70px of scroll. Painted in CSS
    as well as JS so the correct state is there on the first frame. */
-body:not(:has(.hero)) nav{
-  height:74px;background:rgba(5,6,8,0.92);
-  backdrop-filter:blur(18px) saturate(140%);-webkit-backdrop-filter:blur(18px) saturate(140%);
-  box-shadow:0 1px 0 var(--line);}
+body:not(:has(.hero)) nav{height:74px;}
 /* The leading block must clear the fixed bar. Some sections ship an inline
    padding-top:0 from the single-page layout, where a hero sat above them —
    as the first thing on a route that leaves the heading under the nav, so
@@ -1191,7 +1206,9 @@ body:not(:has(.hero)) main > :first-child{padding-top:118px!important;}
 @media screen {
   body { font-size: 16px; line-height: 1.7; }
   .wrap { max-width: 1240px; padding-inline: 32px; }
-  nav { height: 84px; background: rgba(5,6,8,.9); backdrop-filter: blur(18px) saturate(130%); -webkit-backdrop-filter: blur(18px) saturate(130%); box-shadow: 0 1px 0 var(--line); }
+  nav { height: 84px; }
+  nav::before { background: rgba(5,6,8,.9); backdrop-filter: blur(18px) saturate(130%);
+    -webkit-backdrop-filter: blur(18px) saturate(130%); }
   .hero { min-height: clamp(560px,66vh,720px); }
   .hero-in { padding-top: 124px; padding-bottom: 56px; }
   .hero h1 { font-size: clamp(50px,6.6vw,88px); line-height: 1.06; letter-spacing: 0; }
