@@ -1091,10 +1091,7 @@ footer{view-transition-name:site-footer;}
    else the content starts directly beneath it, so headings used to slide
    under a see-through bar during the first 70px of scroll. Painted in CSS
    as well as JS so the correct state is there on the first frame. */
-body:not(:has(.hero)) nav{
-  height:74px;background:rgba(5,6,8,0.92);
-  backdrop-filter:blur(18px) saturate(140%);-webkit-backdrop-filter:blur(18px) saturate(140%);
-  box-shadow:0 1px 0 var(--line);}
+body:not(:has(.hero)) nav{height:74px;}
 /* The leading block must clear the fixed bar. Some sections ship an inline
    padding-top:0 from the single-page layout, where a hero sat above them —
    as the first thing on a route that leaves the heading under the nav, so
