@@ -1,20 +1,8 @@
-# Raw government datasets stay local. They are large, they contain
-# transaction-level records, and nothing in the site reads them directly —
-# only the small aggregated snapshots derived from them are committed.
-data/raw/*
-!data/raw/.gitkeep
-data/manifest.json
-
-# Internal audit and planning notes. Vercel serves this repository
-# statically, so anything committed under data/ would be readable at
-# /data/<name>. These are working documents, not published research.
-data/*.md
-
-# no spreadsheet or archive is ever committed
-*.csv
-*.xlsx
-*.xls
-*.zip
-
-node_modules/
-.DS_Store
+﻿__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.env
+.env.local
+*.lock
+audit.jsonl
