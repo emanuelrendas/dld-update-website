@@ -8,7 +8,7 @@
 
    Every page references this file as:
 
-       /assets/site.js?v=20260823b
+       /assets/site.js?v=20260823c
 
    Change the file, change that stamp in all seven HTML pages, or the
    change is invisible to everyone who has already visited. It is not a

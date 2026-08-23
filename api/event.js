@@ -22,6 +22,11 @@
 
 const TABLE = 'lead_events';
 
+/* The session id is generated in the browser, so its shape is the only thing
+   that can be checked. Anything else is free-text a caller chose. */
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+
 /* A closed list on purpose. An open event name is an open column: within a
    month it is forty variants of the same thing and nothing can be counted. */
 const EVENTS = new Set([
@@ -72,7 +77,7 @@ export default async function handler(req, res) {
   if (!EVENTS.has(event_name)) return res.status(204).end();
 
   const session_id = typeof body.session_id === 'string' ? body.session_id.trim().slice(0, 64) : '';
-  if (!session_id) return res.status(204).end();
+  if (!session_id || !UUID.test(session_id)) return res.status(204).end();
 
   const incoming = body.event_props && typeof body.event_props === 'object' ? body.event_props : {};
   const event_props = {};
