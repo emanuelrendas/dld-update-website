@@ -19,7 +19,7 @@
     {
       "source": "/(.*)",
       "has": [{ "type": "host", "value": "api.emanuelrendas.com" }],
-      "destination": "/api?__path=/api/$1"
+      "destination": "/api?__path=/$1"
     },
     {
       "source": "/dashboard",
