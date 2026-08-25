@@ -11,12 +11,15 @@ import { routeApiRequest } from '../src/api/server.js';
 import { renderCommandCenterHtml } from '../src/dashboard/command-center-html.js';
 
 export default async function handler(req, res) {
-  let url = req.url || '/';
-  const method = req.method || 'GET';
   const headers = req.headers || {};
   const query = req.query || {};
+  const method = req.method || 'GET';
   const body = req.body || {};
   const host = (headers.host || headers['x-forwarded-host'] || '').toLowerCase();
+
+  // Extract actual requested URL from query parameter or matched path header
+  let url = query.__path || headers['x-matched-path'] || req.url || '/';
+  url = url.split('?')[0]; // strip query string for route matching
 
   // 1. Dashboard Subdomain (dashboard.emanuelrendas.com) or '/dashboard'
   if (host.startsWith('dashboard.') || url === '/dashboard' || url === '/dashboard/' || url === '/api/dashboard/ui') {
