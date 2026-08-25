@@ -11,13 +11,36 @@ import { routeApiRequest } from '../src/api/server.js';
 import { renderCommandCenterHtml } from '../src/dashboard/command-center-html.js';
 
 export default async function handler(req, res) {
-  const url = req.url || '/';
+  let url = req.url || '/';
   const method = req.method || 'GET';
   const headers = req.headers || {};
   const query = req.query || {};
   const body = req.body || {};
+  const host = (headers.host || headers['x-forwarded-host'] || '').toLowerCase();
 
-  // 1. Root '/' -> Serve public website index.html
+  // 1. Dashboard Subdomain (dashboard.emanuelrendas.com) or '/dashboard'
+  if (host.startsWith('dashboard.') || url === '/dashboard' || url === '/dashboard/' || url === '/api/dashboard/ui') {
+    const dashHtml = renderCommandCenterHtml();
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+    res.status(200);
+    return typeof res.send === 'function' ? res.send(dashHtml) : res.end(dashHtml);
+  }
+
+  // 2. API Subdomain Normalization (api.emanuelrendas.com)
+  if (host.startsWith('api.')) {
+    if (url === '/' || url === '') {
+      url = '/api/executive/status';
+    } else if (!url.startsWith('/api/')) {
+      if (['/status', '/connectors', '/pipeline', '/alerts', '/kpis', '/chat'].includes(url)) {
+        url = `/api/executive${url}`;
+      } else {
+        url = `/api${url}`;
+      }
+    }
+  }
+
+  // 3. Root '/' on public website -> Serve public website index.html
   if (url === '/' || url === '/index.html' || url === '') {
     try {
       const indexPath = path.resolve('index.html');
@@ -33,16 +56,7 @@ export default async function handler(req, res) {
     }
   }
 
-  // 2. '/dashboard' -> Serve Executive Dashboard
-  if (url === '/dashboard' || url === '/dashboard/' || url === '/api/dashboard/ui') {
-    const dashHtml = renderCommandCenterHtml();
-    res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
-    res.status(200);
-    return typeof res.send === 'function' ? res.send(dashHtml) : res.end(dashHtml);
-  }
-
-  // 3. API & Telemetry Routes
+  // 4. API & Telemetry Routes
   try {
     const response = await routeApiRequest(url, method, body, query, headers);
 

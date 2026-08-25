@@ -1,0 +1,98 @@
+/**
+ * RAIOC IKL - Prime UAE & Dubai Communities Knowledge Base
+ */
+
+import { AuthorityLevel } from '../provenance/provenance-engine.js';
+
+export const communitiesData = [
+  {
+    id: 'comm_downtown_dubai',
+    name: 'Downtown Dubai',
+    type: 'Urban Prime Core',
+    avgGrossYield: 6.8,
+    avgNetYield: 5.4,
+    capitalAppreciationTier: 'HIGH',
+    pricePerSqFtAed: 2450,
+    infrastructureStatus: 'COMPLETED_MATURE',
+    keyLandmarks: ['Burj Khalifa', 'Dubai Mall', 'Dubai Opera'],
+    targetPersonas: ['CAPITAL_APPRECIATION_MAXIMIZER', 'HIGH_NET_WORTH_INSTITUTIONAL'],
+    provenance: {
+      source: 'Dubai Land Department (DLD) Transaction Index',
+      citation: 'DLD Official Open Data Platform 2026',
+      authorityWeight: AuthorityLevel.STATUTORY,
+      lastVerified: '2026-08-01T00:00:00.000Z',
+    },
+  },
+  {
+    id: 'comm_palm_jumeirah',
+    name: 'Palm Jumeirah',
+    type: 'Ultra-Luxury Waterfront',
+    avgGrossYield: 6.2,
+    avgNetYield: 4.9,
+    capitalAppreciationTier: 'VERY_HIGH',
+    pricePerSqFtAed: 3850,
+    infrastructureStatus: 'COMPLETED_MATURE',
+    keyLandmarks: ['Atlantis The Royal', 'Nakheel Mall', 'Palm West Beach'],
+    targetPersonas: ['HIGH_NET_WORTH_INSTITUTIONAL', 'STRATEGIC_ENTERPRISE'],
+    provenance: {
+      source: 'Dubai Land Department (DLD) & DXBInteract',
+      citation: 'DLD Prime Waterfront Transaction Registry',
+      authorityWeight: AuthorityLevel.STATUTORY,
+      lastVerified: '2026-08-01T00:00:00.000Z',
+    },
+  },
+  {
+    id: 'comm_difc',
+    name: 'Dubai International Financial Centre (DIFC)',
+    type: 'Financial District & Free Zone',
+    avgGrossYield: 7.4,
+    avgNetYield: 6.1,
+    capitalAppreciationTier: 'HIGH',
+    pricePerSqFtAed: 2600,
+    infrastructureStatus: 'COMPLETED_MATURE',
+    keyLandmarks: ['Gate Building', 'ICD Brookfield Place', 'DIFC Square'],
+    targetPersonas: ['STRATEGIC_ENTERPRISE', 'YIELD_FOCUSED_PORTFOLIO'],
+    provenance: {
+      source: 'DIFC Authority & DLD Data Hub',
+      citation: 'DIFC Official Commercial & Residential Registry 2026',
+      authorityWeight: AuthorityLevel.STATUTORY,
+      lastVerified: '2026-08-01T00:00:00.000Z',
+    },
+  },
+  {
+    id: 'comm_dubai_hills',
+    name: 'Dubai Hills Estate',
+    type: 'Master-Planned Green Community',
+    avgGrossYield: 7.1,
+    avgNetYield: 5.8,
+    capitalAppreciationTier: 'VERY_HIGH',
+    pricePerSqFtAed: 1950,
+    infrastructureStatus: 'GROWTH_ACTIVE',
+    keyLandmarks: ['Dubai Hills Mall', '18-Hole Championship Golf Course', 'King’s College Hospital'],
+    targetPersonas: ['CAPITAL_APPRECIATION_MAXIMIZER', 'FOUNDATIONAL_RELOCATOR'],
+    provenance: {
+      source: 'Emaar Properties Master Registry / DLD',
+      citation: 'Emaar Institutional Masterplan Report 2026',
+      authorityWeight: AuthorityLevel.INSTITUTIONAL,
+      lastVerified: '2026-08-01T00:00:00.000Z',
+    },
+  },
+  {
+    id: 'comm_business_bay',
+    name: 'Business Bay',
+    type: 'High-Density Commercial & Mixed-Use',
+    avgGrossYield: 8.2,
+    avgNetYield: 6.9,
+    capitalAppreciationTier: 'HIGH',
+    pricePerSqFtAed: 1800,
+    infrastructureStatus: 'ACTIVE_DEVELOPMENT',
+    keyLandmarks: ['Dubai Water Canal', 'Executive Towers', 'Opus by Zaha Hadid'],
+    targetPersonas: ['YIELD_FOCUSED_PORTFOLIO', 'GROWTH_ACCELERATOR'],
+    provenance: {
+      source: 'Dubai Land Department (DLD) Transaction Feed',
+      citation: 'DLD Canal & Commercial Index 2026',
+      authorityWeight: AuthorityLevel.STATUTORY,
+      lastVerified: '2026-08-01T00:00:00.000Z',
+    },
+  },
+];
