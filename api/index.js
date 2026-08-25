@@ -55,7 +55,7 @@ export default async function handler(req, res) {
   }
 
   // 3. Root '/' on public website -> Serve public website index.html
-  if (url === '/' || url === '/index.html' || url === '') {
+  if (!host.startsWith('api.') && !host.startsWith('dashboard.') && (url === '/' || url === '/index.html' || url === '')) {
     try {
       const indexPath = path.resolve('index.html');
       if (fs.existsSync(indexPath)) {
