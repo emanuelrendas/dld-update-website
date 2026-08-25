@@ -74,13 +74,18 @@ export default async function handler(req, res) {
   // 3. Root '/' on public website -> Serve public website index.html
   if (!host.startsWith('api.') && !host.startsWith('dashboard.') && (url === '/' || url === '/index.html' || url === '')) {
     try {
-      const indexPath = path.resolve('index.html');
-      if (fs.existsSync(indexPath)) {
-        const html = fs.readFileSync(indexPath, 'utf8');
-        res.setHeader('Content-Type', 'text/html; charset=utf-8');
-        res.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');
-        res.status(200);
-        return typeof res.send === 'function' ? res.send(html) : res.end(html);
+      const candidates = [
+        path.resolve('public/index.html'),
+        path.resolve('index.html'),
+      ];
+      for (const p of candidates) {
+        if (fs.existsSync(p)) {
+          const html = fs.readFileSync(p, 'utf8');
+          res.setHeader('Content-Type', 'text/html; charset=utf-8');
+          res.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');
+          res.status(200);
+          return typeof res.send === 'function' ? res.send(html) : res.end(html);
+        }
       }
     } catch {
       // Fallback

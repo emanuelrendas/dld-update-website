@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Investment Instruments & Yield Calculators — Dubai Property</title>
+<meta name="description" content="Model a Dubai acquisition yourself: purchase costs, leverage, exit scenarios, short-term rental arbitrage and Golden Visa thresholds — downside shown alongside upside.">
+<link rel="canonical" href="https://www.emanuelrendas.com/instruments">
+<meta name="theme-color" content="#050608">
+<meta name="author" content="Emanuel Rendas">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Emanuel Rendas">
+<meta property="og:url" content="https://www.emanuelrendas.com/instruments">
+<meta property="og:title" content="Investment Instruments & Yield Calculators — Dubai Property">
+<meta property="og:description" content="Model a Dubai acquisition yourself: purchase costs, leverage, exit scenarios, short-term rental arbitrage and Golden Visa thresholds — downside shown alongside upside.">
+<meta property="og:image" content="https://www.emanuelrendas.com/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Emanuel Rendas — Strategic UAE property for global capital">
+<meta property="og:locale" content="en_GB">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Investment Instruments & Yield Calculators — Dubai Property">
+<meta name="twitter:description" content="Model a Dubai acquisition yourself: purchase costs, leverage, exit scenarios, short-term rental arbitrage and Golden Visa thresholds — downside shown alongside upside.">
+<meta name="twitter:image" content="https://www.emanuelrendas.com/og.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script>document.documentElement.classList.add('js');</script>
+<link rel="stylesheet" href="/assets/site.css?v=20260823c">
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "BreadcrumbList",
+ "itemListElement": [
+  {
+   "@type": "ListItem",
+   "position": 1,
+   "name": "Home",
+   "item": "https://www.emanuelrendas.com/"
+  },
+  {
+   "@type": "ListItem",
+   "position": 2,
+   "name": "Instruments",
+   "item": "https://www.emanuelrendas.com/instruments"
+  }
+ ]
+}
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
+</head>
+<body>
+
+<a class="skip" href="#main">Skip to content</a>
+<div id="loader"><div class="lr">R.</div></div>
+<div id="cur-ring"></div><div id="cur-dot"></div>
+<div id="progress"></div>
+
+<nav id="nav" aria-label="Main navigation">
+  <div class="wrap nav-in">
+    <a href="/" class="nav-brand" aria-label="Emanuel Rendas — home">
+      <span class="mk">R.</span>
+      <span class="wd">EMANUEL <span>RENDAS</span></span>
+    </a>
+    <button id="nav-tg" aria-label="Open menu" aria-expanded="false" aria-controls="nav-links">
+      <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+    </button>
+    <div class="nav-links" id="nav-links">
+      <a href="/advisory">Advisory</a>
+      <a href="/intelligence">Intelligence</a>
+      <a href="/addresses">Addresses</a>
+      <a href="/instruments" class="on" aria-current="page">Instruments</a>
+      <a href="/about">About</a>
+      <a href="/contact" class="nav-cta">Private Consultation</a>
+    </div>
+  </div>
+</nav>
+
+<main id="main">
+<section id="instruments">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="label">XIII · The Instruments</span>
+      <h1>Run your own numbers<br>before we ever speak.</h1>
+      <p>Four working tools I use with clients daily. Indicative figures — the precise analysis happens inside a mandate.</p>
+    </div>
+
+    <div class="rv">
+      <div class="tools-tabs" role="tablist">
+        <button class="tt on" data-tab="lab" role="tab">Investment Lab</button>
+        <button class="tt" data-tab="roi" role="tab">Quick Yield</button>
+        <button class="tt" data-tab="visa" role="tab">Golden Visa</button>
+        <button class="tt" data-tab="fx" role="tab">Currency</button>
+        <button class="tt" data-tab="quiz" role="tab">Readiness</button>
+      </div>
+
+      <!-- INVESTMENT LAB -->
+      <div class="tool-panel on" id="tab-lab" role="tabpanel">
+        <div class="lab-g">
+          <div>
+            <div class="lab-sec">
+              <div class="lsh">The Asset</div>
+              <div class="lab-two">
+                <div class="tf"><label for="L-price">Purchase price (AED)</label><input id="L-price" type="number" value="3000000" step="100000" min="0"></div>
+                <div class="tf"><label for="L-rent">Annual rent (AED)</label><input id="L-rent" type="number" value="195000" step="5000" min="0"></div>
+              </div>
+              <div class="lab-two">
+                <div class="tf"><label for="L-sc">Service charge / yr (AED)</label><input id="L-sc" type="number" value="42000" step="1000" min="0"></div>
+                <div class="tf"><label for="L-mgmt">Management fee</label>
+                  <select id="L-mgmt"><option value="0">Self-managed (0%)</option><option value="5" selected>Standard (5% of rent)</option><option value="8">Full service (8%)</option><option value="15">Short-term let (15%)</option></select></div>
+              </div>
+            </div>
+
+            <div class="lab-sec">
+              <div class="lsh">Leverage</div>
+              <div class="lab-two">
+                <div class="tf"><label for="L-ltv">Loan to value</label>
+                  <select id="L-ltv"><option value="0">Cash purchase (0%)</option><option value="50">50% — off-plan cap</option><option value="60" selected>60% — investment property cap</option><option value="65">65% — first home over AED 5M</option><option value="75">75% — expat first home under AED 5M</option><option value="80">80% — UAE national, first home under AED 5M</option></select></div>
+                <div class="tf"><label for="L-rate">Mortgage rate (%)</label><input id="L-rate" type="number" value="4.9" step="0.1" min="0" max="15"></div>
+              </div>
+              <div class="tf"><label for="L-term">Mortgage term</label>
+                <select id="L-term"><option value="15">15 years</option><option value="20">20 years</option><option value="25" selected>25 years</option></select></div>
+            </div>
+
+            <div class="lab-sec">
+              <div class="lsh">Horizon &amp; Assumptions</div>
+              <div class="lab-two">
+                <div class="tf"><label for="L-exit">Hold period</label>
+                  <select id="L-exit"><option value="3">3 years</option><option value="5" selected>5 years</option><option value="7">7 years</option><option value="10">10 years</option></select></div>
+                <div class="tf"><label for="L-app">Annual appreciation (%)</label><input id="L-app" type="number" value="5" step="0.5" min="-10" max="25"></div>
+              </div>
+              <p class="tool-note">Appreciation is the assumption that drives everything. The three scenarios opposite stress-test your figure at minus three points and plus three points — because no forecast should be presented as a single number.</p>
+            </div>
+          </div>
+
+          <div>
+            <div class="scenarios">
+              <div class="scn"><div class="sh">Downside</div><div class="sv" id="S-dn">—</div><div class="sl">Total return</div><div class="sa" id="S-dn-a">—</div></div>
+              <div class="scn mid"><div class="sh">Your assumption</div><div class="sv" id="S-md">—</div><div class="sl">Total return</div><div class="sa" id="S-md-a">—</div></div>
+              <div class="scn"><div class="sh">Upside</div><div class="sv" id="S-up">—</div><div class="sl">Total return</div><div class="sa" id="S-up-a">—</div></div>
+            </div>
+
+            <div class="kpi-g">
+              <div class="kpi"><div class="kv" id="K-cash">—</div><div class="kl">Total cash required</div></div>
+              <div class="kpi" id="K-cf-box"><div class="kv" id="K-cf">—</div><div class="kl">Net cash flow / year</div></div>
+              <div class="kpi"><div class="kv" id="K-coc">—</div><div class="kl">Cash-on-cash return</div></div>
+              <div class="kpi"><div class="kv" id="K-irr">—</div><div class="kl">IRR at exit</div></div>
+            </div>
+
+            <div class="flow">
+              <div class="flow-h">Acquisition &amp; Exit — your assumption</div>
+              <div class="flow-r"><span class="fk">Down payment</span><span class="fv" id="F-down">—</span></div>
+              <div class="flow-r"><span class="fk">DLD transfer fee (4%)</span><span class="fv" id="F-dld">—</span></div>
+              <div class="flow-r"><span class="fk">Agency commission (2%)</span><span class="fv" id="F-comm">—</span></div>
+              <div class="flow-r"><span class="fk">Mortgage registration (0.25%)</span><span class="fv" id="F-mreg">—</span></div>
+              <div class="flow-r tot"><span class="fk">Total cash in</span><span class="fv" id="F-in">—</span></div>
+              <div class="flow-r"><span class="fk">Annual mortgage payments</span><span class="fv red" id="F-mort">—</span></div>
+              <div class="flow-r"><span class="fk">Projected value at exit</span><span class="fv" id="F-exit">—</span></div>
+              <div class="flow-r"><span class="fk">Loan balance at exit</span><span class="fv red" id="F-bal">—</span></div>
+              <div class="flow-r"><span class="fk">Selling cost (2%)</span><span class="fv red" id="F-sell">—</span></div>
+              <div class="flow-r tot"><span class="fk">Net proceeds</span><span class="fv" id="F-net">—</span></div>
+            </div>
+            <p class="tool-note">Estimator, not a lender quotation. <strong>LTV options above are the UAE Central Bank caps, not bank preferences</strong> — 60% is the ceiling on any investment or second property regardless of price, and 50% on off-plan. The top bands apply only to a first home under AED 5M, and split by nationality — 75% for expatriate residents, 80% for UAE nationals; above AED 5M it is 65% and 70%. Non-residents sit at 50% off-plan and up to 65% ready, with most banks pricing 50–60%. Rate ranges here are <b>indicative, not quotations</b>: around 3.75% is a headline for salary-transfer residents, while investors and non-residents have priced roughly 4.49% to 6.2%. Banks reprice against the UAE Central Bank base rate and against your own profile, so a real offer may sit outside this range in either direction. Only a lender can quote you. Early settlement is capped by regulation at 1% of outstanding balance or AED 10,000, whichever is lower. Verified 5 August 2026.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ROI -->
+      <div class="tool-panel" id="tab-roi" role="tabpanel">
+        <div class="tool-g">
+          <div>
+            <div class="tf"><label for="r-price">Purchase price (AED)</label><input id="r-price" type="number" value="2500000" min="100000" step="50000"></div>
+            <div class="tf"><label for="r-rent">Expected annual rent (AED)</label><input id="r-rent" type="number" value="160000" min="0" step="5000"></div>
+            <div class="tf"><label for="r-sc">Annual service charges (AED)</label><input id="r-sc" type="number" value="22000" min="0" step="1000"></div>
+            <div class="tf">
+              <label for="r-app">Assumed annual appreciation</label>
+              <input id="r-app" type="range" min="0" max="12" value="6" step="0.5">
+              <div class="range-val"><span id="r-app-v">6.0</span>% per year</div>
+            </div>
+          </div>
+          <div class="res-panel">
+            <div class="res-title">Indicative Performance</div>
+            <div class="res-line"><span class="rk">Gross yield</span><span class="rvv" id="r-gross">—</span></div>
+            <div class="res-line"><span class="rk">Net yield</span><span class="rvv gold" id="r-net">—</span></div>
+            <div class="res-line"><span class="rk">Monthly net income</span><span class="rvv" id="r-monthly">—</span></div>
+            <div class="res-line"><span class="rk">Projected value · 5 years</span><span class="rvv" id="r-5y">—</span></div>
+            <div class="res-line big"><span class="rk">Total 5-year return</span><span class="rvv gold" id="r-total">—</span></div>
+            <p class="tool-note">Excludes purchase costs (≈6–8%) and assumes stable occupancy. A mandate analysis models both precisely.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- GOLDEN VISA -->
+      <div class="tool-panel" id="tab-visa" role="tabpanel">
+        <div class="tool-g">
+          <div>
+            <div class="tf"><label for="v-val">Property value (AED)</label><input id="v-val" type="number" value="2000000" min="0" step="100000"></div>
+            <div class="tf"><label for="v-paid">Payment structure</label>
+              <select id="v-paid"><option value="full">Fully paid / cash</option><option value="mortgage">Mortgaged / financed</option></select>
+            </div>
+            <p class="tool-note">The 10-year UAE Golden Visa requires property value of AED 2,000,000 or above. Eligibility rules evolve — I confirm the current position for every client before purchase.</p>
+          </div>
+          <div class="res-panel">
+            <div class="res-title">Eligibility Check</div>
+            <div class="gv-verdict" id="v-verdict"><div class="v1">Enter your figures</div><div class="v2">The check updates instantly.</div></div>
+            <div class="res-line" style="margin-top:16px;"><span class="rk">Visa duration</span><span class="rvv">10 years</span></div>
+            <div class="res-line"><span class="rk">Family included</span><span class="rvv gold">Spouse & children</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FX -->
+      <div class="tool-panel" id="tab-fx" role="tabpanel">
+        <div class="tool-g">
+          <div>
+            <div class="tf"><label for="fx-amt">Amount</label><input id="fx-amt" type="number" value="2500000" min="0" step="10000"></div>
+            <div class="tf"><label for="fx-cur">Currency</label>
+              <select id="fx-cur"><option value="AED">AED — UAE Dirham</option><option value="USD">USD — US Dollar</option><option value="EUR">EUR — Euro</option><option value="GBP">GBP — British Pound</option></select>
+            </div>
+            <p class="tool-note"><span id="fx-src">Rates verified 4 August 2026.</span> AED/USD is the fixed UAE Central Bank peg. EUR and GBP are derived from European Central Bank reference rates, published once per working day. On large transfers an FX specialist typically saves AED 30,000–80,000 against a retail bank — I introduce clients to ours.</p>
+          </div>
+          <div class="res-panel">
+            <div class="res-title">Converted</div>
+            <div class="res-line"><span class="rk">AED</span><span class="rvv" id="fx-aed">—</span></div>
+            <div class="res-line"><span class="rk">USD</span><span class="rvv" id="fx-usd">—</span></div>
+            <div class="res-line"><span class="rk">EUR <i style="font-style:normal;font-size:9px;color:var(--smoke);">indicative</i></span><span class="rvv" id="fx-eur">—</span></div>
+            <div class="res-line"><span class="rk">GBP <i style="font-style:normal;font-size:9px;color:var(--smoke);">indicative</i></span><span class="rvv" id="fx-gbp">—</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- QUIZ -->
+      <div class="tool-panel" id="tab-quiz" role="tabpanel">
+        <div class="tool-g">
+          <div id="quiz-box">
+            <div class="quiz-q"><div class="qt">1 · What is this capital being asked to do?</div>
+              <div class="quiz-opts" data-q="0"><button class="qo" data-s="2">Capital appreciation</button><button class="qo" data-s="2">Rental income</button><button class="qo" data-s="3">Residency strategy</button><button class="qo" data-s="3">Capital preservation</button></div></div>
+            <div class="quiz-q"><div class="qt">2 · What allocation are you considering?</div>
+              <div class="quiz-opts" data-q="1"><button class="qo" data-s="1">Under AED 2M</button><button class="qo" data-s="2">AED 2M — 15M</button><button class="qo" data-s="3">AED 15M — 50M</button><button class="qo" data-s="3">AED 50M+</button></div></div>
+            <div class="quiz-q"><div class="qt">3 · What is your timeline?</div>
+              <div class="quiz-opts" data-q="2"><button class="qo" data-s="3">Ready now</button><button class="qo" data-s="2">Within 6 months</button><button class="qo" data-s="1">Exploring for later</button></div></div>
+            <div class="quiz-q"><div class="qt">4 · Have you purchased in Dubai before?</div>
+              <div class="quiz-opts" data-q="3"><button class="qo" data-s="2">Yes</button><button class="qo" data-s="2">No — first time</button></div></div>
+          </div>
+          <div class="res-panel">
+            <div class="res-title">Your Reading</div>
+            <div id="quiz-out">
+              <div class="gv-verdict"><div class="v1">Answer the four questions</div><div class="v2">A short, honest reading — not a sales score.</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="str" id="str">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="label">XV · Short-Term Rental &amp; Yield Arbitrage</span>
+      <h2>The spread between gross<br>and net is <em>the entire decision.</em></h2>
+      <p>Licensed holiday-home operation raises gross revenue materially above a twelve-month tenancy. It also introduces roughly eight lines of cost that an annual lease does not carry. Underwritten properly, the arbitrage is real in specific micro-locations and negative in others. Verified against DET fee schedules and published operator benchmarks, August 2026.</p>
+    </div>
+
+    <div class="str-pillars">
+      <div class="str-p rv">
+        <div class="pl">Pillar A</div>
+        <h3>Yield arbitrage &amp; dynamic pricing</h3>
+        <p>A twelve-month tenancy fixes your rate for a year. Holiday-home operation reprices nightly against demand — peak season October to April, event-driven spikes, and a summer trough where rates fall <strong>30–45%</strong>.</p>
+        <p>The arbitrage is RevPAR, not headline nightly rate. A high ADR at 55% occupancy underperforms a moderate ADR at 80%. Underwrite the product, never the peak-season screenshot.</p>
+      </div>
+      <div class="str-p rv rv-d1">
+        <div class="pl">Pillar B</div>
+        <h3>Cost friction &amp; operator selection</h3>
+        <p>Operator management runs <strong>15–20%</strong> of booking revenue, plus 5% VAT on that fee. Add Tourism Dirham at AED 10–20 per night, 7% municipality fee, utilities and connectivity, consumables, and furnishing capex amortised across three to five years.</p>
+        <p>Service charges of AED 10–30 per sqft for apartments, higher in branded towers, apply identically under both models — but they consume a far larger share of a thin net. In a high-charge Downtown tower, net can sit <strong>2–3 points</strong> below gross.</p>
+      </div>
+      <div class="str-p rv rv-d2">
+        <div class="pl">Pillar C</div>
+        <h3>Dual-exit flexibility</h3>
+        <p>A holiday-home unit is never locked. It can revert to twelve-month tenancy at the end of any booking, absorb personal occupancy in a chosen window, or be sold furnished to a buyer who wants the operating income intact.</p>
+        <p>That optionality carries measurable value in a market where <strong>HOA bylaws in many buildings prohibit short-let entirely.</strong> Confirm the building permits it before you place capital, not after.</p>
+      </div>
+    </div>
+
+    <div class="rv">
+      <div class="mode" role="group" aria-label="Tenancy model">
+        <button class="mode-b" data-mode="lt">
+          <span class="mb-t">Long-Term Tenancy</span>
+          <span class="mb-s">Twelve-month contract. Fixed rate, single tenant, minimal operating drag.</span>
+        </button>
+        <button class="mode-b on" data-mode="str">
+          <span class="mb-t">Dynamic STR Yield</span>
+          <span class="mb-s">DET-licensed holiday home. Nightly repricing, full operating friction.</span>
+        </button>
+      </div>
+
+      <div class="str-g">
+        <div class="str-in">
+          <div class="lab-sec">
+            <div class="lsh">The Asset</div>
+            <div class="tf"><label for="T-price">Purchase price (AED)</label><input id="T-price" type="number" value="1800000" step="50000" min="0"></div>
+            <div class="tf"><label for="T-size">Internal area (sqft)</label><input id="T-size" type="number" value="850" step="25" min="0"></div>
+            <div class="tf"><label for="T-sc">Service charge (AED / sqft / yr)</label><input id="T-sc" type="number" value="20" step="1" min="0"></div>
+          </div>
+          <div class="lab-sec">
+            <div class="lsh">Long-Term Model</div>
+            <div class="tf"><label for="T-rent">Annual contract rent (AED)</label><input id="T-rent" type="number" value="100000" step="5000" min="0"></div>
+          </div>
+          <div class="lab-sec">
+            <div class="lsh">Short-Term Model</div>
+            <div class="lab-two">
+              <div class="tf"><label for="T-adr">Peak ADR (AED / night)</label><input id="T-adr" type="number" value="700" step="10" min="0"></div>
+              <div class="tf"><label for="T-occ">Annual occupancy (%)</label><input id="T-occ" type="number" value="78" step="1" min="0" max="100"></div>
+            </div>
+            <div class="lab-two">
+              <div class="tf"><label for="T-op">Operator fee</label>
+                <select id="T-op"><option value="0">Self-managed (0%)</option><option value="15">Operator (15%)</option><option value="18" selected>Operator (18%)</option><option value="20">Full service (20%)</option></select></div>
+              <div class="tf"><label for="T-furn">Furnishing capex (AED)</label><input id="T-furn" type="number" value="85000" step="5000" min="0"></div>
+            </div>
+            <p class="str-note">Summer trough is modelled automatically: five months at 62% of peak ADR, consistent with published Dubai seasonality of 30–45% off-peak discounting.</p>
+          </div>
+        </div>
+
+        <div class="str-out">
+          <div class="noi">
+            <div class="noi-h"><span id="noi-title">Dynamic STR Yield</span><span id="noi-sub">annual</span></div>
+            <div id="noi-rows"></div>
+          </div>
+          <div class="verdict">
+            <div class="vt">Arbitrage verdict</div>
+            <div class="vv" id="v-head">—</div>
+            <div class="vd" id="v-body">—</div>
+          </div>
+          <p class="str-note">Fee inputs from DET schedules: AED 1,520 one-time registration, AED 370–1,270 annual unit permit by bedroom count, Tourism Dirham AED 10–20 per occupied night, 7% municipality fee, 5% VAT on operator services. Occupancy, ADR and furnishing capex are your inputs, not my claims — the model computes on what you enter. The 7% municipality fee is guest-borne under standard operator structures and is excluded here — confirm the treatment in your operator agreement, as it moves net by roughly 70bps. Operating without a permit carries fines from AED 5,000, escalating to AED 100,000 with delisting.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="ft-g">
+      <div class="ft-brand">
+        <a href="/" class="mk" aria-label="Home">R.</a>
+        <div class="n1">EMANUEL RENDAS</div>
+        <div class="n2">Private Real Estate Advisory · Dubai</div>
+      </div>
+      <div class="ft-links">
+        <a href="/about">The Advisor</a>
+        <a href="/advisory">Advisory</a>
+        <a href="/advisory#risk">The Case Against</a>
+        <a href="/advisory#partners">Developers</a>
+        <a href="/advisory#method">Process</a>
+        <a href="/intelligence">Intelligence</a>
+        <a href="/intelligence#global">Dubai vs World</a>
+        <a href="/addresses">Addresses</a>
+        <a href="/addresses#map">Intelligence Map</a>
+        <a href="/instruments">Instruments</a>
+        <a href="/instruments#str">STR Yield</a>
+        <a href="/about#trust">Why Trust Me</a>
+        <a href="/about#speaking">Speaking</a>
+        <a href="/contact#faq">Questions</a>
+        <a href="/contact">Consultation</a>
+      </div>
+      <div class="ft-social">
+        <span class="fs-l">Follow</span>
+        <div class="social" id="social-links"></div>
+        <div class="ft-tag" style="text-align:right;margin-top:6px;">"Wealth is built quietly.<br>Legacy is built deliberately."</div>
+      </div>
+    </div>
+    <div class="legal">
+      <div class="legal-g">
+        <div class="legal-c">
+          <div class="lt">Privacy</div>
+          <p>Your brief is stored so that I can reply to it — your name, your email and what you write, held privately and reachable only by me. It is never sold, never shared, and never added to a mailing list unless you ask for one. Anonymous page statistics record which pages are read; they are not tied to you and set no advertising cookie. The form also opens WhatsApp on your own device with a message you can read and edit before sending. Ask at any time and your record is deleted.</p>
+        </div>
+        <div class="legal-c">
+          <div class="lt">Confidentiality</div>
+          <p>Client identities, transaction details and portfolio positions are never disclosed — not to other clients, not in marketing, not in any form. Any reference published here carries that client's written permission.</p>
+        </div>
+        <div class="legal-c">
+          <div class="lt">Sourcing Standard</div>
+          <p>Every figure on this site carries its source, publication date and confidence level — hover or tap any underlined number. Verified means an official release. Indicative means a range from registered transactions. Forecast means an assumption that may not occur. Where the intelligence map shows a Modelled tag, that figure is my own analysis rather than a published statistic, and the methodology is stated beside it. If a figure cannot be traced to an authoritative source, it is not published here.</p>
+        </div>
+        <div class="legal-c">
+          <div class="lt">Disclaimer</div>
+          <p>Figures shown, including calculator outputs and market indications, are illustrative and not a forecast or guarantee. Property values can fall. Nothing here constitutes financial, tax or legal advice. Independent advice should be taken before any purchase.</p>
+        </div>
+      </div>
+    </div>
+    <div class="ft-bot">
+      <span>© 2026 Emanuel Rendas · Dubai, UAE<br><span class="ft-practice">Private Real Estate Advisory</span> &nbsp;·&nbsp; <span style="opacity:.5">build 2026.08.05-a</span></span>
+      <span>Off-Market · Pre-Launch · Palm Jumeirah</span>
+    </div>
+  </div>
+</footer>
+
+<a id="wa" href="https://wa.me/971543871702?text=Hello%20Emanuel%20%E2%80%94%20I%20found%20your%20website%20and%20would%20like%20to%20discuss%20Dubai%20real%20estate." aria-label="WhatsApp Emanuel Rendas">
+  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.5 14.4c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.96-.94 1.16-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.48-.89-.79-1.49-1.77-1.66-2.07-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.8.37-.27.3-1.04 1.02-1.04 2.5 0 1.47 1.07 2.9 1.22 3.1.15.2 2.1 3.2 5.1 4.49.71.3 1.27.49 1.7.63.72.23 1.37.2 1.88.12.57-.08 1.76-.72 2.01-1.42.25-.7.25-1.29.17-1.42-.07-.13-.27-.2-.57-.35zM12.05 21.5h-.01a9.4 9.4 0 0 1-4.8-1.32l-.34-.2-3.56.93.95-3.47-.22-.36a9.42 9.42 0 0 1-1.45-5.03c0-5.2 4.24-9.44 9.45-9.44a9.4 9.4 0 0 1 6.68 2.77 9.38 9.38 0 0 1 2.76 6.68c0 5.21-4.24 9.44-9.46 9.44zm8.05-17.5A11.32 11.32 0 0 0 12.04 0C5.46 0 .1 5.35.1 11.94c0 2.1.55 4.16 1.6 5.97L0 24l6.24-1.64a11.93 11.93 0 0 0 5.8 1.48h.01c6.58 0 11.94-5.36 11.94-11.94 0-3.19-1.24-6.19-3.5-8.44z"/></svg><span class="wa-t">WhatsApp</span></a>
+
+<script src="/assets/site.js?v=20260823c" defer></script>
+<script src="/assets/calc.js?v=20260823c" defer></script>
+<script src="/assets/share.js?v=20260823c" defer></script>
+</body>
+</html>
