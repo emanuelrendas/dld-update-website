@@ -13,11 +13,7 @@
   "rewrites": [
     {
       "source": "/dashboard",
-      "destination": "/api/index.js"
-    },
-    {
-      "source": "/health",
-      "destination": "/api/index.js"
+      "destination": "/api/dashboard.js"
     }
   ],
   "headers": [
