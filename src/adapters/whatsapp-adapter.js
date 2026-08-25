@@ -26,38 +26,67 @@ export class WhatsAppAdapter {
       return { status: 'simulated', recipient, timestamp: new Date().toISOString() };
     }
 
-    // In production without external webhook URL configured, we record safe delivery payload
-    if (!this.apiUrl) {
-      logger.info('WHATSAPP_ADAPTER', `Payload generated and ready for WhatsApp delivery to ${recipient}`, {
+    // Resolve active Meta WhatsApp Cloud API credentials
+    const token = process.env.WHATSAPP_SYSTEM_USER_TOKEN || 
+                  process.env.WHATSAPP_ACCESS_TOKEN || 
+                  this.apiKey || 
+                  config.whatsappBusiness?.accessToken || 
+                  config.adapters.whatsapp?.apiKey;
+
+    const phoneId = process.env.WHATSAPP_PHONE_NUMBER_ID || 
+                    config.whatsappBusiness?.phoneNumberId || 
+                    config.adapters.whatsapp?.phoneNumberId;
+
+    const endpointUrl = this.apiUrl || 
+                        (phoneId ? `https://graph.facebook.com/v20.0/${phoneId}/messages` : null);
+
+    // If live API credentials are not present, record cleanly in queue
+    if (!token || !endpointUrl) {
+      logger.info('WHATSAPP_ADAPTER', `WhatsApp brief payload cleanly queued for delivery to ${recipient} (status: QUEUED_FOR_DISPATCH)`, {
         length: message.length,
+        hasToken: Boolean(token),
+        hasPhoneId: Boolean(phoneId),
       });
       return {
-        status: 'queued_for_gateway',
+        status: 'QUEUED_FOR_DISPATCH',
+        reason: 'awaiting_credentials',
         recipient,
         messageLength: message.length,
         timestamp: new Date().toISOString(),
       };
     }
 
-    // Send HTTP POST to WhatsApp Business API / Webhook
-    const res = await fetch(this.apiUrl, {
+    // Send HTTP POST to Meta WhatsApp Cloud API
+    logger.info('WHATSAPP_ADAPTER', `Sending live WhatsApp message to ${recipient} via Meta Cloud API...`);
+    const res = await fetch(endpointUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${this.apiKey}`,
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
-        to: recipient,
+        messaging_product: 'whatsapp',
+        recipient_type: 'individual',
+        to: recipient.replace(/[^0-9+]/g, ''),
         type: 'text',
         text: { body: message },
       }),
     });
 
     if (!res.ok) {
-      throw new Error(`WhatsApp API responded with status ${res.status}: ${res.statusText}`);
+      const errText = await res.text();
+      throw new Error(`WhatsApp API error (${res.status}): ${errText}`);
     }
 
-    return await res.json();
+    const data = await res.json();
+    logger.info('WHATSAPP_ADAPTER', `🎉 WhatsApp delivered successfully to ${recipient}! MessageId: ${data.messages?.[0]?.id || 'ACK'}`);
+    return {
+      status: 'SENT',
+      provider: 'whatsapp_cloud',
+      messageId: data.messages?.[0]?.id || 'ACK',
+      recipient,
+      timestamp: new Date().toISOString(),
+    };
   }
 }
 

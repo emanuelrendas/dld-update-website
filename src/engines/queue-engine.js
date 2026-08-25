@@ -45,19 +45,25 @@ export class QueueEngine {
     try {
       const result = await adapter.dispatch(task);
 
-      // Successfully dispatched
+      const finalStatus = (result && (result.status === 'SENT' || result.status === 'sent_smtp' || result.messageId))
+        ? 'SENT'
+        : (result && result.status === 'QUEUED_FOR_DISPATCH' ? 'QUEUED_FOR_DISPATCH' : 'dispatched');
+
+      // Successfully dispatched or queued
       await dbClient.updateDispatchTask(task.id, {
-        status: 'dispatched',
+        status: finalStatus,
         dispatched_at: new Date().toISOString(),
         delivery_receipt: result,
       });
 
-      logger.audit('QUEUE_ENGINE', 'TASK_DISPATCHED', task.id, 'processing', 'dispatched', {
+      logger.audit('QUEUE_ENGINE', finalStatus === 'SENT' ? 'TASK_SENT' : 'TASK_QUEUED_FOR_DISPATCH', task.id, 'processing', finalStatus, {
         type: task.type,
         recipient: task.recipient,
+        provider: result?.provider,
+        messageId: result?.messageId,
       });
 
-      return { success: true, result };
+      return { success: true, status: finalStatus, result };
     } catch (err) {
       const currentRetries = (task.retry_count || 0) + 1;
       logger.warn('QUEUE_ENGINE', `Task dispatch failed: ${task.id} (Attempt ${currentRetries}/${this.maxRetries})`, {

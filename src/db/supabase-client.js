@@ -38,13 +38,13 @@ export class SupabaseClient {
   async fetchPendingLeads(limit = 50) {
     if (this.isMock) {
       return this.mockStore.leads
-        .filter((l) => l.status === 'pending' || !l.status)
+        .filter((l) => l.status === 'pending' || l.status === 'INGESTED' || l.status === 'new' || !l.status)
         .slice(0, limit);
     }
 
     try {
       const res = await fetch(
-        `${this.url}/rest/v1/leads?status=in.(pending,new)&order=created_at.asc&limit=${limit}`,
+        `${this.url}/rest/v1/leads?status=in.(pending,new,INGESTED)&order=created_at.asc&limit=${limit}`,
         {
           headers: {
             apikey: this.key,
@@ -64,7 +64,7 @@ export class SupabaseClient {
   async fetchPendingAssessments(limit = 50) {
     if (this.isMock) {
       return this.mockStore.assessments
-        .filter((a) => a.status === 'pending' || !a.status)
+        .filter((a) => a.status === 'pending' || a.status === 'INGESTED' || a.status === 'new' || !a.status)
         .slice(0, limit);
     }
 

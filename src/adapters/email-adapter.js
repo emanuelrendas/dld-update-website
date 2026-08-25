@@ -101,6 +101,47 @@ export class EmailAdapter {
       return { status: 'simulated', recipient, timestamp: new Date().toISOString() };
     }
 
+    // --- 1. Resend API Flow ---
+    const resendKey = process.env.RESEND_API_KEY || process.env.RESEND_KEY || config.resend?.apiKey;
+    if (resendKey) {
+      try {
+        logger.info('EMAIL_ADAPTER', `Dispatching email to ${recipient} via Resend API...`);
+        const res = await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${resendKey}`,
+          },
+          body: JSON.stringify({
+            from: cfg.from,
+            to: [recipient],
+            subject,
+            text,
+            html,
+          }),
+        });
+
+        if (res.ok) {
+          const resendData = await res.json();
+          logger.info('EMAIL_ADAPTER', `🎉 Email delivered via Resend! MessageId: ${resendData.id}`);
+          return {
+            status: 'SENT',
+            provider: 'resend',
+            messageId: resendData.id,
+            recipient,
+            subject,
+            from: cfg.from,
+            timestamp: new Date().toISOString(),
+          };
+        } else {
+          const errBody = await res.text();
+          logger.warn('EMAIL_ADAPTER', `Resend API returned status ${res.status}: ${errBody}`);
+        }
+      } catch (resendErr) {
+        logger.warn('EMAIL_ADAPTER', `Resend API dispatch failed: ${resendErr.message}`);
+      }
+    }
+
     // If live credentials are NOT provided in environment:
     if (!cfg.user || !cfg.password) {
       const diagMsg = `Missing SMTP credentials: SMTP_USER='${cfg.user || '[EMPTY]'}', SMTP_PASSWORD exists=${Boolean(cfg.password)} (length=${cfg.password ? cfg.password.length : 0}).`;
@@ -121,14 +162,15 @@ export class EmailAdapter {
       }
 
       // Default queue fallback for offline dev/tests
-      logger.info('EMAIL_ADAPTER', `Executive Brief email ready for delivery to ${recipient} (awaiting credentials)`, {
+      logger.info('EMAIL_ADAPTER', `Executive Brief email payload cleanly queued for delivery to ${recipient} (status: QUEUED_FOR_DISPATCH)`, {
         subject,
         host: cfg.host,
         port: cfg.port,
         secure: cfg.secure,
       });
       return {
-        status: 'queued_for_mailer',
+        status: 'QUEUED_FOR_DISPATCH',
+        reason: 'awaiting_credentials',
         recipient,
         subject,
         host: cfg.host,

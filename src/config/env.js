@@ -30,13 +30,24 @@ export const config = {
     secure: process.env.SMTP_SECURE !== 'false',
     user: process.env.SMTP_USER || '',
     password: process.env.SMTP_PASSWORD || process.env.SMTP_PASS || '',
-    from: process.env.SMTP_FROM || process.env.EMAIL_FROM || 'Emanuel Rendas Private Advisory <intelligence@emanuelrendas.com>',
+    from: process.env.SMTP_FROM || process.env.EMAIL_FROM || 'Emanuel Rendas Private Advisory <privateadvisory@emanuelrendas.com>',
+  },
+  resend: {
+    apiKey: process.env.RESEND_API_KEY || process.env.RESEND_KEY || '',
+    from: process.env.RESEND_FROM || process.env.EMAIL_FROM || 'Emanuel Rendas Private Advisory <privateadvisory@emanuelrendas.com>',
+  },
+  whatsappBusiness: {
+    phoneNumberId: process.env.WHATSAPP_PHONE_NUMBER_ID || '',
+    accessToken: process.env.WHATSAPP_SYSTEM_USER_TOKEN || process.env.WHATSAPP_ACCESS_TOKEN || process.env.WHATSAPP_API_KEY || '',
+    apiUrl: process.env.WHATSAPP_API_URL || '',
+    enabled: process.env.WHATSAPP_ENABLED !== 'false',
   },
   adapters: {
     whatsapp: {
       enabled: process.env.WHATSAPP_ENABLED !== 'false',
       apiUrl: process.env.WHATSAPP_API_URL || '',
-      apiKey: process.env.WHATSAPP_API_KEY || '',
+      apiKey: process.env.WHATSAPP_SYSTEM_USER_TOKEN || process.env.WHATSAPP_ACCESS_TOKEN || process.env.WHATSAPP_API_KEY || '',
+      phoneNumberId: process.env.WHATSAPP_PHONE_NUMBER_ID || '',
     },
     email: {
       enabled: process.env.SMTP_ENABLED !== 'false' && process.env.EMAIL_ENABLED !== 'false',
@@ -45,9 +56,9 @@ export const config = {
       secure: process.env.SMTP_SECURE !== 'false',
       user: process.env.SMTP_USER || '',
       password: process.env.SMTP_PASSWORD || process.env.SMTP_PASS || '',
-      from: process.env.SMTP_FROM || process.env.EMAIL_FROM || 'Emanuel Rendas Private Advisory <intelligence@emanuelrendas.com>',
+      from: process.env.SMTP_FROM || process.env.EMAIL_FROM || 'Emanuel Rendas Private Advisory <privateadvisory@emanuelrendas.com>',
       apiUrl: process.env.EMAIL_API_URL || '',
-      apiKey: process.env.SMTP_PASSWORD || process.env.EMAIL_API_KEY || '',
+      apiKey: process.env.RESEND_API_KEY || process.env.SMTP_PASSWORD || process.env.EMAIL_API_KEY || '',
     },
     crm: {
       enabled: process.env.CRM_ENABLED !== 'false',
