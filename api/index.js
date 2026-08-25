@@ -9,6 +9,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { routeApiRequest } from '../src/api/server.js';
 import { renderCommandCenterHtml } from '../src/dashboard/command-center-html.js';
+import { sitePages } from '../src/site/site-pages.js';
 
 export default async function handler(req, res) {
   const headers = req.headers || {};
@@ -73,44 +74,15 @@ export default async function handler(req, res) {
 
   // 3. Static Web Pages & Assets on public website (www.emanuelrendas.com / emanuelrendas.com)
   if (!host.startsWith('api.') && !host.startsWith('dashboard.')) {
-    const pageMap = {
-      '': 'index.html',
-      '/': 'index.html',
-      '/index': 'index.html',
-      '/index.html': 'index.html',
-      '/about': 'about.html',
-      '/about.html': 'about.html',
-      '/contact': 'contact.html',
-      '/contact.html': 'contact.html',
-      '/advisory': 'advisory.html',
-      '/advisory.html': 'advisory.html',
-      '/instruments': 'instruments.html',
-      '/instruments.html': 'instruments.html',
-      '/intelligence': 'intelligence.html',
-      '/intelligence.html': 'intelligence.html',
-      '/addresses': 'addresses.html',
-      '/addresses.html': 'addresses.html',
-    };
+    let cleanKey = url.replace(/^\//, '').replace(/\.html$/, '').split('?')[0].toLowerCase();
+    if (cleanKey === '' || cleanKey === 'index') cleanKey = 'index';
 
-    const targetFile = pageMap[url];
-    if (targetFile) {
-      try {
-        const candidates = [
-          path.resolve('public', targetFile),
-          path.resolve(targetFile),
-        ];
-        for (const p of candidates) {
-          if (fs.existsSync(p)) {
-            const html = fs.readFileSync(p, 'utf8');
-            res.setHeader('Content-Type', 'text/html; charset=utf-8');
-            res.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');
-            res.status(200);
-            return typeof res.send === 'function' ? res.send(html) : res.end(html);
-          }
-        }
-      } catch {
-        // Fallback
-      }
+    if (sitePages && sitePages[cleanKey]) {
+      const html = sitePages[cleanKey];
+      res.setHeader('Content-Type', 'text/html; charset=utf-8');
+      res.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');
+      res.status(200);
+      return typeof res.send === 'function' ? res.send(html) : res.end(html);
     }
 
     // Static assets fallback
