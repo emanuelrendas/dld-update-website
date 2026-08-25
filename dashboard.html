@@ -1,11 +1,4 @@
-/**
- * RAIOC Executive Command Center (Sprint 3)
- * Full Enterprise Next.js/React-compatible Single Page Application with Tailwind styling,
- * Glassmorphic UI, Supabase Realtime SSE streaming, and all 18 production widgets.
- */
-
-export function renderCommandCenterHtml() {
-  return `<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
   <meta charset="UTF-8">
@@ -361,26 +354,26 @@ export function renderCommandCenterHtml() {
       // Agents Roster
       const agentList = document.getElementById('agent-roster-list');
       if (data.agents && agentList) {
-        agentList.innerHTML = data.agents.map(a => \`
+        agentList.innerHTML = data.agents.map(a => `
           <div class="p-3 bg-gray-900/60 rounded-lg border border-gray-800 flex items-center justify-between hover:border-gray-700 transition">
             <div class="flex items-center space-x-3">
-              <div class="w-8 h-8 rounded-full bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700 flex items-center justify-center font-mono font-bold text-xs \${a.id === 'jarvis' ? 'text-accent-400 ring-1 ring-accent-500' : 'text-gray-300'}">
-                \${a.name.substring(0, 2)}
+              <div class="w-8 h-8 rounded-full bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700 flex items-center justify-center font-mono font-bold text-xs ${a.id === 'jarvis' ? 'text-accent-400 ring-1 ring-accent-500' : 'text-gray-300'}">
+                ${a.name.substring(0, 2)}
               </div>
               <div>
                 <div class="flex items-center gap-2">
-                  <h4 class="text-xs font-bold text-white">\${a.name}</h4>
-                  <span class="text-[9px] font-mono px-1.5 py-0.2 rounded \${a.status === 'BUSY' ? 'bg-amber-500/20 text-amber-400' : a.status === 'ERROR' ? 'bg-rose-500/20 text-rose-400' : 'bg-emerald-500/20 text-emerald-400'}">\${a.status}</span>
+                  <h4 class="text-xs font-bold text-white">${a.name}</h4>
+                  <span class="text-[9px] font-mono px-1.5 py-0.2 rounded ${a.status === 'BUSY' ? 'bg-amber-500/20 text-amber-400' : a.status === 'ERROR' ? 'bg-rose-500/20 text-rose-400' : 'bg-emerald-500/20 text-emerald-400'}">${a.status}</span>
                 </div>
-                <p class="text-[10px] text-gray-400 truncate max-w-[180px]">\${a.role}</p>
+                <p class="text-[10px] text-gray-400 truncate max-w-[180px]">${a.role}</p>
               </div>
             </div>
             <div class="text-right text-[10px] font-mono text-gray-400">
-              <div class="text-emerald-400">\${a.tasksCompleted || 0} done</div>
-              <div class="text-gray-500">\${a.isAutonomous ? 'Autonomous' : 'Standby'}</div>
+              <div class="text-emerald-400">${a.tasksCompleted || 0} done</div>
+              <div class="text-gray-500">${a.isAutonomous ? 'Autonomous' : 'Standby'}</div>
             </div>
           </div>
-        \`).join('');
+        `).join('');
       }
 
       // Connector Matrix
@@ -389,61 +382,61 @@ export function renderCommandCenterHtml() {
         connList.innerHTML = connectors.map(c => {
           const isActive = c.status === 'ACTIVE';
           const isBlocked = c.status === 'BLOCKED';
-          return \`
+          return `
             <div class="p-2.5 bg-gray-900/60 rounded-lg border border-gray-800 flex items-center justify-between">
               <div class="flex items-center space-x-2">
-                <span class="w-2 h-2 rounded-full \${isActive ? 'bg-emerald-500' : isBlocked ? 'bg-amber-500' : 'bg-rose-500'}"></span>
-                <span class="font-medium text-gray-300">\${c.name}</span>
+                <span class="w-2 h-2 rounded-full ${isActive ? 'bg-emerald-500' : isBlocked ? 'bg-amber-500' : 'bg-rose-500'}"></span>
+                <span class="font-medium text-gray-300">${c.name}</span>
               </div>
               <div class="flex items-center space-x-2 font-mono text-[10px]">
-                <span class="\${isActive ? 'text-emerald-400' : 'text-amber-400'}">\${c.status}</span>
-                \${c.latencyMs ? \`<span class="text-gray-500">\${c.latencyMs}ms</span>\` : ''}
+                <span class="${isActive ? 'text-emerald-400' : 'text-amber-400'}">${c.status}</span>
+                ${c.latencyMs ? `<span class="text-gray-500">${c.latencyMs}ms</span>` : ''}
               </div>
             </div>
-          \`;
+          `;
         }).join('');
       }
 
       // Decisions
       const decList = document.getElementById('decision-log-list');
       if (data.recentStrategicDecisions && decList) {
-        decList.innerHTML = data.recentStrategicDecisions.map(d => \`
+        decList.innerHTML = data.recentStrategicDecisions.map(d => `
           <div class="p-2.5 bg-gray-900/60 rounded-lg border border-gray-800">
             <div class="flex justify-between items-center text-[10px] font-mono text-gray-400 mb-1">
-              <span class="text-accent-400 font-bold">\${d.chosenAction}</span>
-              <span>\${d.timestamp?.substring(11, 19) || ''}</span>
+              <span class="text-accent-400 font-bold">${d.chosenAction}</span>
+              <span>${d.timestamp?.substring(11, 19) || ''}</span>
             </div>
-            <p class="text-[11px] text-gray-300">\${d.rationale}</p>
+            <p class="text-[11px] text-gray-300">${d.rationale}</p>
           </div>
-        \`).join('');
+        `).join('');
       }
 
       // Cognitive Memory Categories
       const memGrid = document.getElementById('memory-category-grid');
       if (data.memoryStats?.cognitiveMemoryStats?.byCategory && memGrid) {
         const cats = data.memoryStats.cognitiveMemoryStats.byCategory;
-        memGrid.innerHTML = Object.entries(cats).map(([cat, count]) => \`
+        memGrid.innerHTML = Object.entries(cats).map(([cat, count]) => `
           <div class="p-2 bg-gray-900/60 rounded-lg border border-gray-800 text-center">
-            <p class="text-[10px] text-gray-400 truncate">\${cat.replace(/_/g, ' ')}</p>
-            <p class="text-sm font-bold text-white font-mono">\${count}</p>
+            <p class="text-[10px] text-gray-400 truncate">${cat.replace(/_/g, ' ')}</p>
+            <p class="text-sm font-bold text-white font-mono">${count}</p>
           </div>
-        \`).join('');
+        `).join('');
         document.getElementById('memory-total-count').textContent = data.memoryStats.cognitiveMemoryStats.totalMemories + ' Records';
       }
 
       // Opportunities
       const oppList = document.getElementById('opportunity-feed-list');
       if (data.openOpportunities && oppList) {
-        oppList.innerHTML = data.openOpportunities.map(o => \`
+        oppList.innerHTML = data.openOpportunities.map(o => `
           <div class="p-2.5 bg-gray-900/60 rounded-lg border border-amber-500/20">
             <div class="flex justify-between items-center text-[10px] font-mono text-amber-400 mb-1">
-              <span class="font-bold">\${o.type}</span>
-              <span>AED \${(o.estimatedValueAed || 0).toLocaleString()}</span>
+              <span class="font-bold">${o.type}</span>
+              <span>AED ${(o.estimatedValueAed || 0).toLocaleString()}</span>
             </div>
-            <p class="text-[11px] text-gray-300 font-medium">\${o.title}</p>
-            <p class="text-[10px] text-gray-500 mt-1">\${o.rationale}</p>
+            <p class="text-[11px] text-gray-300 font-medium">${o.title}</p>
+            <p class="text-[10px] text-gray-500 mt-1">${o.rationale}</p>
           </div>
-        \`).join('');
+        `).join('');
       }
 
       lucide.createIcons();
@@ -465,15 +458,15 @@ export function renderCommandCenterHtml() {
 
             const streamContainer = document.getElementById('event-stream-list');
             if (streamContainer) {
-              streamContainer.innerHTML = liveEvents.map(e => \`
+              streamContainer.innerHTML = liveEvents.map(e => `
                 <div class="p-2 bg-gray-900/70 rounded border border-gray-800 flex justify-between items-center text-[11px]">
                   <div class="flex items-center space-x-2">
-                    <span class="px-1.5 py-0.5 rounded text-[9px] bg-accent-500/20 text-accent-400">\${e.metadata?.sourceAgent || 'sys'}</span>
-                    <span class="text-gray-300 font-semibold">\${e.topic}</span>
+                    <span class="px-1.5 py-0.5 rounded text-[9px] bg-accent-500/20 text-accent-400">${e.metadata?.sourceAgent || 'sys'}</span>
+                    <span class="text-gray-300 font-semibold">${e.topic}</span>
                   </div>
-                  <span class="text-[10px] text-gray-500">\${e.metadata?.timestamp?.substring(11, 19) || ''}</span>
+                  <span class="text-[10px] text-gray-500">${e.metadata?.timestamp?.substring(11, 19) || ''}</span>
                 </div>
-              \`).join('');
+              `).join('');
             }
           }
         } catch (e) {
@@ -492,5 +485,4 @@ export function renderCommandCenterHtml() {
     setInterval(fetchDashboardData, 10000);
   </script>
 </body>
-</html>`;
-}
+</html>

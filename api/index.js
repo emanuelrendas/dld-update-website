@@ -25,8 +25,25 @@ export default async function handler(req, res) {
   url = url.replace(/^\/api\/api\//, '/api/');
 
   // 1. Dashboard Subdomain (dashboard.emanuelrendas.com) or '/dashboard'
-  if (host.startsWith('dashboard.') || url === '/dashboard' || url === '/dashboard/' || url === '/api/dashboard/ui') {
-    const dashHtml = renderCommandCenterHtml();
+  if (host.includes('dashboard') || url === '/dashboard' || url === '/dashboard/' || url === '/dashboard.html' || url === '/api/dashboard/ui') {
+    let dashHtml = '';
+    try {
+      const candidates = [
+        path.resolve('public/dashboard.html'),
+        path.resolve('dashboard.html'),
+      ];
+      for (const p of candidates) {
+        if (fs.existsSync(p)) {
+          dashHtml = fs.readFileSync(p, 'utf8');
+          break;
+        }
+      }
+    } catch {
+      // fallback
+    }
+    if (!dashHtml) {
+      dashHtml = renderCommandCenterHtml();
+    }
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
     res.status(200);

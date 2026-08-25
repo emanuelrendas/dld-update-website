@@ -12,6 +12,11 @@
   ],
   "rewrites": [
     {
+      "source": "/",
+      "has": [{ "type": "host", "value": "dashboard.emanuelrendas.com" }],
+      "destination": "/api?__path=/dashboard"
+    },
+    {
       "source": "/(.*)",
       "has": [{ "type": "host", "value": "dashboard.emanuelrendas.com" }],
       "destination": "/api?__path=/dashboard"
