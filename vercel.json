@@ -33,6 +33,10 @@
     {
       "source": "/api/(.*)",
       "destination": "/api?__path=/api/$1"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/api?__path=/$1"
     }
   ],
   "headers": [
