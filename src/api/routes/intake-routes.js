@@ -3,17 +3,20 @@
  */
 
 import { getSupabaseCredentials } from '../../../api/_supabase.js';
+import { checkRateLimit, clientKey, LIMITS } from '../rate-limit.js';
 
-export async function handleIntakeRequest(method = 'GET', payload = {}) {
+/* No Access-Control-Allow-Origin. This route writes to the CRM, and a
+   wildcard on a write endpoint lets any page on the internet post rows
+   into `leads` from a visitor's browser. The site calls it from its own
+   origin, where CORS does not apply. */
+export async function handleIntakeRequest(method = 'GET', payload = {}, options = {}) {
   const headers = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type',
-    'Content-Type': 'application/json',
+    'Content-Type': 'application/json; charset=utf-8',
+    'Cache-Control': 'no-store',
   };
 
   if (method === 'OPTIONS') {
-    return { status: 200, headers, body: null };
+    return { status: 405, headers: { ...headers, Allow: 'GET, POST' }, body: null };
   }
 
   const { url: URL_BASE, serviceKey: SERVICE, isConfigured } = getSupabaseCredentials();
@@ -33,8 +36,17 @@ export async function handleIntakeRequest(method = 'GET', payload = {}) {
   if (method !== 'POST') {
     return {
       status: 405,
-      headers,
+      headers: { ...headers, Allow: 'GET, POST' },
       body: { ok: false, error: 'Method not allowed. Use POST.' },
+    };
+  }
+
+  const rate = checkRateLimit(clientKey(options.headers), LIMITS.write);
+  if (!rate.allowed) {
+    return {
+      status: 429,
+      headers: { ...headers, 'Retry-After': String(rate.retryAfterSeconds) },
+      body: { ok: false, stored: false, error: 'Too many submissions. Please try again shortly.' },
     };
   }
 
@@ -70,7 +82,9 @@ export async function handleIntakeRequest(method = 'GET', payload = {}) {
       const mandate = (body.mandate_description || body.notes || '').trim() || null;
       const objective = (body.investment_objective || body.objective || '').trim() || null;
       const budget = (body.budget_band || body.budget || '').trim() || null;
-      const consent = body.consent_given !== false;
+      /* An explicit tick, not an absent field. `!== false` treated a
+         payload carrying no consent key at all as consent given. */
+      const consent = body.consent_given === true;
 
       if (!name || !email) {
         return { status: 400, headers, body: { ok: false, error: 'Name and email are required.' } };
@@ -153,7 +167,13 @@ export async function handleIntakeRequest(method = 'GET', payload = {}) {
           session_id,
           event_name,
           event_props: body.event_props || null,
-          page_url: body.page_url || null,
+          /* Path only — see the note in event-routes.js. */
+          page_url: (() => {
+            const u = body.page_url;
+            if (typeof u !== 'string' || !u) return null;
+            try { return new URL(u).pathname.slice(0, 200); }
+            catch { return u.split('?')[0].slice(0, 200); }
+          })(),
           lead_id: body.lead_id || null,
           created_at: new Date().toISOString(),
         }),
@@ -165,23 +185,49 @@ export async function handleIntakeRequest(method = 'GET', payload = {}) {
       const session_id = body.session_id || 'sess_assessment';
       const answers = body.answers || {};
 
-      await fetch(`${URL_BASE}/rest/v1/lead_assessment_responses`, {
-        method: 'POST',
-        headers: { apikey: SERVICE, Authorization: `Bearer ${SERVICE}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+      /* lead_assessment_responses is one row per answer:
+         (session_id, question_key, answer_value), both NOT NULL. It has
+         no `responses` column — posting a JSON blob to it is rejected
+         with PGRST204 and every answer is lost. */
+      const rows = Object.entries(answers)
+        .filter(([k, v]) => k && v !== null && v !== undefined && v !== '')
+        .map(([question_key, answer_value]) => ({
           session_id,
-          responses: answers,
+          question_key: String(question_key).slice(0, 80),
+          answer_value: String(answer_value).slice(0, 500),
           lead_id: body.lead_id || null,
           created_at: new Date().toISOString(),
-        }),
+        }));
+
+      if (!rows.length) {
+        return { status: 400, headers, body: { ok: false, error: 'No answers supplied.' } };
+      }
+
+      const ar = await fetch(`${URL_BASE}/rest/v1/lead_assessment_responses`, {
+        method: 'POST',
+        headers: {
+          apikey: SERVICE,
+          Authorization: `Bearer ${SERVICE}`,
+          'Content-Type': 'application/json',
+          Prefer: 'return=minimal',
+        },
+        body: JSON.stringify(rows),
+        signal: AbortSignal.timeout(10000),
       });
+
+      if (!ar.ok) {
+        console.error(`intake: assessment_submit ${ar.status} ${(await ar.text()).slice(0, 400)}`);
+        return { status: 502, headers, body: { ok: false, stored: false, error: 'The answers could not be saved.' } };
+      }
 
       return {
         status: 200,
         headers,
         body: {
           ok: true,
+          stored: true,
           session_id,
+          answers_stored: rows.length,
           status: 'completed',
         },
       };
@@ -196,7 +242,9 @@ export async function handleIntakeRequest(method = 'GET', payload = {}) {
     return {
       status: 500,
       headers,
-      body: { ok: false, error: err.message },
+      /* The message goes to the log. A PostgREST or fetch error can echo
+         column names, constraint definitions and internal hostnames. */
+      body: { ok: false, error: 'That request could not be completed.' },
     };
   }
 }

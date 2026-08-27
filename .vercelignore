@@ -1,0 +1,34 @@
+# Vercel resolves a real file on disk before applying a rewrite, so a
+# committed file is a published file even with the catch-all route into
+# api/index.js. Nothing listed here is read at runtime.
+#
+# src/ is NOT excluded: api/index.js imports the router from it.
+
+# Python backend. It belongs to a separate service and is not deployed
+# from here. Left in git, kept out of the public document root — source
+# served as text/plain would publish table names, column names, request
+# shapes and environment variable names.
+mission1/
+web_intake/
+run_cycle.py
+requirements.txt
+*.py
+
+# Test suites: fixture payloads and internal contracts, not public docs.
+tests/
+
+# Ingest tooling and the local dataset staging directory.
+tools/
+data/
+
+# Internal notes and operational scripts. README_API.md and README_DLD.md
+# describe endpoint contracts and the DLD ingest; verify-site.sh lists the
+# checks the site is expected to pass.
+README.md
+README_API.md
+README_DLD.md
+verify-site.sh
+
+# Repository metadata
+.github/
+.gitignore

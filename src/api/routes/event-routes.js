@@ -3,6 +3,7 @@
  */
 
 import { getSupabaseCredentials } from '../../../api/_supabase.js';
+import { checkRateLimit, clientKey, LIMITS } from '../rate-limit.js';
 
 const TABLE = 'lead_events';
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -29,7 +30,7 @@ const PROPS = {
   stored:        (v) => Boolean(v),
 };
 
-export async function handleEventRequest(method = 'GET', body = {}) {
+export async function handleEventRequest(method = 'GET', body = {}, options = {}) {
   const headers = {
     'Content-Type': 'application/json; charset=utf-8',
     'Cache-Control': 'no-store',
@@ -52,6 +53,12 @@ export async function handleEventRequest(method = 'GET', body = {}) {
     };
   }
 
+  /* Telemetry answers 204 either way, so a limited caller is simply not
+     written. Nothing about the limit is signalled back. */
+  if (!checkRateLimit(clientKey(options.headers), LIMITS.telemetry).allowed) {
+    return { status: 204, headers, body: null };
+  }
+
   const { url: URL_BASE, serviceKey: SERVICE, isConfigured } = getSupabaseCredentials();
   if (!isConfigured) {
     return { status: 204, headers, body: null };
@@ -70,8 +77,12 @@ export async function handleEventRequest(method = 'GET', body = {}) {
     return { status: 204, headers, body: null };
   }
 
+  /* The session id is minted by the browser as a UUID. Requiring the
+     shape keeps arbitrary 64-character strings — an id smuggled in from
+     another system, or one chosen to collide with a real visitor's —
+     out of the column used to stitch a session's events together. */
   const session_id = typeof payload.session_id === 'string' ? payload.session_id.trim().slice(0, 64) : '';
-  if (!session_id) {
+  if (!session_id || !UUID.test(session_id)) {
     return { status: 204, headers, body: null };
   }
 
@@ -83,7 +94,15 @@ export async function handleEventRequest(method = 'GET', body = {}) {
     }
   }
 
-  const page_url = typeof payload.page_url === 'string' ? payload.page_url.slice(0, 500) : null;
+  /* Path only, never the full href. The calculator's share link puts the
+     purchase price, deposit and hold period in the query string; storing
+     the href copies a visitor's private figures into the telemetry table
+     as a side effect of them pressing Share. */
+  let page_url = null;
+  if (typeof payload.page_url === 'string' && payload.page_url) {
+    try { page_url = new URL(payload.page_url).pathname.slice(0, 200); }
+    catch { page_url = payload.page_url.split('?')[0].slice(0, 200); }
+  }
   const lead_id = typeof payload.lead_id === 'string' && UUID.test(payload.lead_id) ? payload.lead_id : null;
 
   try {

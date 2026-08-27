@@ -1,8 +1,34 @@
-﻿__pycache__/
+# Raw government datasets stay local. They are large, they contain
+# transaction-level records, and nothing in the site reads them directly —
+# only the small aggregated snapshots derived from them are committed.
+data/raw/*
+!data/raw/.gitkeep
+data/manifest.json
+
+# Internal audit and planning notes. Vercel resolves a real file on disk
+# before it applies a rewrite, so anything committed under data/ stays
+# readable at /data/<name> regardless of the catch-all route. These are
+# working documents, not published research.
+data/*.md
+
+# no spreadsheet or archive is ever committed
+*.csv
+*.xlsx
+*.xls
+*.zip
+
+node_modules/
+.DS_Store
+
+# Python tooling
+__pycache__/
 *.py[cod]
 *$py.class
 .pytest_cache/
-.env
-.env.local
 *.lock
 audit.jsonl
+
+# Secrets never enter git. Vercel and Supabase credentials live in the
+# hosting environment, nowhere else.
+.env
+.env.local
