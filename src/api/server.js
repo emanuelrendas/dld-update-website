@@ -46,11 +46,11 @@ export async function routeApiRequest(reqPath, method = 'GET', body = {}, query 
     }
     // 4. Telemetry / Event Tracking
     else if (url === '/api/event' || url.startsWith('/api/event/')) {
-      response = await handleEventRequest(method, body);
+      response = await handleEventRequest(method, body, { headers });
     }
     // 5. Multi-channel Intake
     else if (url === '/api/intake' || url.startsWith('/api/intake/')) {
-      response = await handleIntakeRequest(method, body);
+      response = await handleIntakeRequest(method, body, { headers });
     }
     // 6. IKL Endpoints
     else if (url.startsWith('/api/ikl')) {
@@ -62,11 +62,11 @@ export async function routeApiRequest(reqPath, method = 'GET', body = {}, query 
     }
     // 8. Assessment Submission
     else if (url.startsWith('/api/assessment') || url.startsWith('/api/dira')) {
-      response = await handleAssessmentSubmission(body);
+      response = await handleAssessmentSubmission(body, { headers, method });
     }
     // 9. Lead Submission
     else if (url.startsWith('/api/lead') || url.startsWith('/api/brief')) {
-      response = await handleLeadSubmission(body);
+      response = await handleLeadSubmission(body, { headers, method });
     }
     // 10. Webhook Endpoints (n8n & WhatsApp)
     else if (url.startsWith('/api/webhooks')) {
