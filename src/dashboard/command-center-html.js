@@ -338,9 +338,14 @@ export function renderCommandCenterHtml() {
     // Fetch snapshot
     async function fetchDashboardData() {
       try {
+        const overviewRes = await fetch(API_BASE + '/api/dashboard/overview', { credentials: 'include' });
+        if (overviewRes.status === 401) {
+          window.location.href = '/dashboard';
+          return;
+        }
         const [dashRes, connRes] = await Promise.all([
-          fetch(API_BASE + '/api/dashboard/overview').then(r => r.json()),
-          fetch(API_BASE + '/api/dashboard/connectors').then(r => r.json()).catch(() => ({ connectors: [] })),
+          overviewRes.json(),
+          fetch(API_BASE + '/api/dashboard/connectors', { credentials: 'include' }).then(r => r.json()).catch(() => ({ connectors: [] })),
         ]);
 
         renderDashboard(dashRes, connRes.connectors || []);
@@ -451,7 +456,7 @@ export function renderCommandCenterHtml() {
 
     // Connect SSE Realtime Stream
     function initRealtimeStream() {
-      const evtSource = new EventSource(API_BASE + '/api/dashboard/stream');
+      const evtSource = new EventSource(API_BASE + '/api/dashboard/stream', { withCredentials: true });
       
       evtSource.onmessage = (event) => {
         try {

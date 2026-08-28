@@ -1,11 +1,18 @@
 /**
  * RAIOC API - Telemetry, Executive Feeds & Mission Control Routes (EXEC-002 & Sprint 3)
  * Implements production-ready Executive API endpoints:
- * - GET /api/executive/status
- * - GET /api/executive/connectors
- * - GET /api/test-email
- * - GET /dashboard
- * - GET /api/health
+ * - GET /api/executive/status (requires INTERNAL_SERVICE_KEY)
+ * - GET /api/executive/connectors (requires INTERNAL_SERVICE_KEY)
+ * - GET /dashboard (requires a human dashboard session)
+ * - GET /api/health (public)
+ *
+ * Authentication:
+ * - /api/executive/* and /api/telemetry/* are machine-to-machine and require
+ *   INTERNAL_SERVICE_KEY via src/security/auth-middleware.js.
+ * - /api/dashboard/* (except /login) and /dashboard require a signed human
+ *   session cookie via src/security/dashboard-session.js. The service key is
+ *   never sent to the browser.
+ * - /api/dashboard/login and /api/dashboard/logout are public but rate limited.
  */
 
 import { telemetry } from '../../logging/telemetry.js';
@@ -17,6 +24,7 @@ import { connectorHealthMatrix } from '../../monitoring/connector-health-matrix.
 import { agentEventBus } from '../../events/agent-event-bus.js';
 import { autonomousTaskManager } from '../../operational/autonomous-task-manager.js';
 import { renderCommandCenterHtml } from '../../dashboard/command-center-html.js';
+import { renderDashboardLoginPage } from '../../dashboard/dashboard-login-html.js';
 import { emailAdapter } from '../../adapters/email-adapter.js';
 import { supabase } from '../../db/supabase-client.js';
 import { jarvis } from '../../agents/specialists/jarvis-orchestrator.js';
@@ -24,6 +32,9 @@ import { kpiCollector } from '../../operational/kpi-collector.js';
 import { sharedMemory } from '../../memory/shared-memory.js';
 import { businessIntelligenceBus } from '../../events/business-intelligence-bus.js';
 import { secretsManager } from '../../config/secrets-manager.js';
+import { authMiddleware, Roles } from '../../security/auth-middleware.js';
+import { dashboardSessionManager } from '../../security/dashboard-session.js';
+import { checkRateLimit, clientKey, LIMITS } from '../rate-limit.js';
 
 /**
  * Real production connector prober with strict Zero Mock Policy.
@@ -260,6 +271,66 @@ async function probeExecutiveConnectors() {
 
 export async function handleTelemetryRequest(path, context = {}) {
   const normalized = path.replace(/^\/api\/(dashboard|telemetry|executive)\/?/, '');
+  const headers = context.headers || {};
+
+  // 0a. Dashboard human session login (public, rate limited)
+  if (path === '/api/dashboard/login') {
+    const limit = checkRateLimit(clientKey(headers), LIMITS.write);
+    if (!limit.allowed) {
+      return { status: 429, body: { error: 'Too many login attempts, try again later' } };
+    }
+
+    const body = context.body || {};
+    const result = dashboardSessionManager.authenticate(body.password);
+    if (!result.success) {
+      return { status: 401, body: { success: false, error: result.error } };
+    }
+    return {
+      status: 200,
+      headers: { 'Set-Cookie': result.cookie },
+      body: { success: true },
+    };
+  }
+
+  // 0b. Dashboard human session logout (public)
+  if (path === '/api/dashboard/logout') {
+    return {
+      status: 200,
+      headers: { 'Set-Cookie': dashboardSessionManager.clearCookieHeader() },
+      body: { success: true },
+    };
+  }
+
+  // 0c. Executive Command Center UI (HTML) - session-gated, shows login page when unauthenticated
+  if (path === '/dashboard' || path === '/api/dashboard/ui') {
+    if (!dashboardSessionManager.verifyRequest(headers)) {
+      return {
+        status: 200,
+        headers: { 'Content-Type': 'text/html' },
+        body: renderDashboardLoginPage({ notConfigured: !dashboardSessionManager.isConfigured() }),
+      };
+    }
+    return {
+      status: 200,
+      headers: { 'Content-Type': 'text/html' },
+      body: renderCommandCenterHtml(),
+    };
+  }
+
+  // 0d. Remaining /api/dashboard/* JSON endpoints require a human dashboard session
+  if (path.startsWith('/api/dashboard/')) {
+    if (!dashboardSessionManager.verifyRequest(headers)) {
+      return { status: 401, body: { error: 'Dashboard session required' } };
+    }
+  }
+
+  // 0e. /api/executive/* and /api/telemetry/* are machine-to-machine and require INTERNAL_SERVICE_KEY
+  if (path.startsWith('/api/executive') || path.startsWith('/api/telemetry')) {
+    const auth = authMiddleware.authenticateRequest(headers, [Roles.ADMIN, Roles.AGENT]);
+    if (!auth.authenticated) {
+      return { status: 401, body: { error: auth.error } };
+    }
+  }
 
   // 1. Executive Telemetry Status: GET /api/executive/status
   if (path === '/api/executive/status' || normalized === 'status' || path === '/api/telemetry/status') {
@@ -435,104 +506,6 @@ export async function handleTelemetryRequest(path, context = {}) {
         agentContributions: report.agentContributions,
         timestamp: new Date().toISOString(),
       },
-    };
-  }
-
-  // 3. Live Diagnostic SMTP Endpoint: /api/test-email
-  if (path === '/api/test-email' || normalized === 'test-email') {
-    const query = context.query || {};
-    const body = context.body || {};
-    const to = query.to || body.to || 'privateadvisory@emanuelrendas.com';
-    const subject = query.subject || body.subject || 'RAIOC — SMTP Live Operational Verification';
-    const customMessage = query.message || body.message || 'RAIOC Autonomous Operating System — Live Production Test Email';
-
-    const cfg = emailAdapter.getSmtpConfig();
-
-    try {
-      const result = await emailAdapter.dispatch(
-        {
-          id: `diag_live_${Date.now()}`,
-          recipient: to,
-          payload: {
-            subject,
-            body: `${customMessage}\n\nRecipient: ${to}\nTransport: Namecheap PrivateEmail (SMTP / Nodemailer)\nHost: ${cfg.host}:${cfg.port} (SSL: ${cfg.secure})\nFrom: ${cfg.from}\nTimestamp: ${new Date().toISOString()}\n\nStatus: VERIFIED_OPERATIONAL`,
-          },
-        },
-        { requireLiveSend: true }
-      );
-
-      return {
-        status: 200,
-        body: {
-          success: true,
-          endpoint: '/api/test-email',
-          recipient: to,
-          smtpDiagnostics: {
-            host: cfg.host,
-            port: cfg.port,
-            secure: cfg.secure,
-            from: cfg.from,
-            userLoaded: Boolean(cfg.user),
-            user: cfg.user ? cfg.user : '[NOT SET]',
-            passwordExists: Boolean(cfg.password),
-            passwordLength: cfg.password ? cfg.password.length : 0,
-          },
-          dispatchResult: {
-            status: result.status,
-            smtpVerified: result.smtpVerified,
-            accepted: result.accepted || [],
-            rejected: result.rejected || [],
-            response: result.response,
-            messageId: result.messageId,
-            envelope: result.envelope,
-          },
-          timestamp: new Date().toISOString(),
-        },
-      };
-    } catch (err) {
-      logger.error('TELEMETRY_ROUTES', `Live SMTP test failed: ${err.message}`, {
-        code: err.code,
-        command: err.command,
-        response: err.response,
-        stack: err.stack,
-      });
-
-      return {
-        status: 500,
-        body: {
-          success: false,
-          endpoint: '/api/test-email',
-          recipient: to,
-          smtpDiagnostics: {
-            host: cfg.host,
-            port: cfg.port,
-            secure: cfg.secure,
-            from: cfg.from,
-            userLoaded: Boolean(cfg.user),
-            user: cfg.user ? cfg.user : '[NOT SET]',
-            passwordExists: Boolean(cfg.password),
-            passwordLength: cfg.password ? cfg.password.length : 0,
-          },
-          error: {
-            message: err.message,
-            code: err.code || 'UNKNOWN_ERROR',
-            command: err.command || null,
-            response: err.response || null,
-            responseCode: err.responseCode || null,
-            stack: err.stack,
-          },
-          timestamp: new Date().toISOString(),
-        },
-      };
-    }
-  }
-
-  // 4. Executive Command Center UI (HTML)
-  if (path === '/dashboard' || path === '/api/dashboard/ui') {
-    return {
-      status: 200,
-      headers: { 'Content-Type': 'text/html' },
-      body: renderCommandCenterHtml(),
     };
   }
 
