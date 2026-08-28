@@ -1,0 +1,15 @@
+{
+  "name": "dld-update-website",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "emanuelrendas.com — static site plus a single Vercel serverless entrypoint (api/index.js) that routes into src/api. Not a published package; private:true and version:0.0.0 are deliberate.",
+  "scripts": {
+    "check": "for f in $(find api src -name '*.js'); do node --check \"$f\" || exit 1; done",
+    "test": "node --test tests/integration/*.test.js",
+    "build": "npm run check && npm test"
+  },
+  "dependencies": {
+    "nodemailer": "9.0.6"
+  }
+}

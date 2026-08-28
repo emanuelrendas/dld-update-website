@@ -1,0 +1,62 @@
+name: CI
+
+# Runs on every push and pull request against main. This is the check;
+# whether it can actually block a merge or a direct push depends on
+# GitHub branch-protection settings, which are configured separately in
+# the repository settings, not by this file. See MISSION-005 for the
+# open question of whether that enforcement step has been completed.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Cancels a stale run when a newer push or PR update lands on the same
+# ref, so a rapid sequence of pushes doesn't queue redundant work.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: install, syntax-check, test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Node 22 matches this repository's local development environment
+      # at the time this workflow was written (node --version: v22.22.2).
+      # It has NOT been confirmed against the Node runtime this project
+      # is actually configured to use on Vercel — that confirmation was
+      # attempted (via the Vercel MCP integration) and came back empty,
+      # not negative: the connected Vercel account/team has zero projects
+      # visible to it, so the live project's settings could not be read.
+      # If the two ever diverge, this workflow proves the code installs
+      # and tests cleanly on Node 22; it does not prove parity with the
+      # deployed runtime until someone confirms that value and updates
+      # this line (and adds engines.node to package.json, deliberately
+      # omitted for the same reason).
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      # npm ci, not npm install: fails if package.json and
+      # package-lock.json disagree, which is itself the reproducibility
+      # proof this mission exists to add.
+      - run: npm ci
+
+      # Syntax-checks every deployed JS file (api/, src/) and runs the
+      # existing integration suite (tests/integration/). Scoped
+      # deliberately: the 16-file Python suite under tests/ exercises
+      # web_intake/ and mission1/, code that is not part of the deployed
+      # path (see .vercelignore), and including it here would report a
+      # health signal disconnected from what's actually live.
+      - run: npm run build
+
+      # Informational, not a blocker: this repository has exactly one
+      # runtime dependency (nodemailer), so this checks that one package
+      # and whatever it pulls in transitively. Confirmed clean locally
+      # (`npm audit --audit-level=high` → 0 vulnerabilities) before being
+      # added here.
+      - run: npm audit --audit-level=high
