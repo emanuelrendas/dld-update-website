@@ -262,6 +262,19 @@
           </div>
         </div>
 
+        <!-- Recent Leads (public intake -> leads table) -->
+        <div class="glass-panel p-5 rounded-xl">
+          <div class="flex justify-between items-center mb-4">
+            <h2 class="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+              <i data-lucide="users" class="w-4 h-4 text-emerald-400"></i> Recent Leads
+            </h2>
+            <span id="recent-leads-count" class="text-[11px] font-mono text-gray-400"></span>
+          </div>
+          <div id="recent-leads-list" class="space-y-2.5 max-h-[300px] overflow-y-auto scrollbar-thin text-xs pr-1">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
         <!-- Long-Term Cognitive Memory Viewer -->
         <div class="glass-panel p-5 rounded-xl">
           <div class="flex justify-between items-center mb-4">
@@ -442,6 +455,24 @@
             <p class="text-[10px] text-gray-500 mt-1">${o.rationale}</p>
           </div>
         `).join('');
+      }
+
+      // Recent Leads (real public-intake writes to the leads table)
+      const leadsList = document.getElementById('recent-leads-list');
+      const leadsCount = document.getElementById('recent-leads-count');
+      if (data.pipeline && leadsList) {
+        const deals = data.pipeline.recentDeals || [];
+        if (leadsCount) leadsCount.textContent = (data.pipeline.activeDealsCount || 0) + ' total';
+        leadsList.innerHTML = deals.length ? deals.map(d => `
+          <div class="p-2.5 bg-gray-900/60 rounded-lg border border-gray-800">
+            <div class="flex justify-between items-center text-[10px] font-mono text-emerald-400 mb-1">
+              <span class="font-bold">${d.investorName}</span>
+              <span>AED ${(d.budgetAed || 0).toLocaleString()}</span>
+            </div>
+            <p class="text-[11px] text-gray-300">${d.email || '—'} &middot; ${d.status}</p>
+            <p class="text-[10px] text-gray-500 mt-1">${d.createdAt ? new Date(d.createdAt).toLocaleString() : ''}</p>
+          </div>
+        `).join('') : '<p class="text-[11px] text-gray-500">No leads yet.</p>';
       }
 
       lucide.createIcons();

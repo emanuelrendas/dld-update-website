@@ -178,6 +178,14 @@ describe('INTEGRATION: unauthenticated write/send surface is closed', () => {
 
     const overviewRes = await handleTelemetryRequest('/api/dashboard/overview', { headers: { cookie: cookiePair } });
     assert.equal(overviewRes.status, 200);
+
+    // MISSION-007: /api/dashboard/overview must carry real pipeline data
+    // (from SupabaseClient.fetchPipelineSummary()), not just the synthetic
+    // operational snapshot — this is what makes a real submitted lead
+    // visible to a human dashboard session.
+    assert.ok(overviewRes.body.pipeline, 'expected a pipeline key on the overview response');
+    assert.ok(Array.isArray(overviewRes.body.pipeline.recentDeals), 'expected pipeline.recentDeals to be an array');
+    assert.equal(typeof overviewRes.body.pipeline.activeDealsCount, 'number');
   });
 
   test('logout clears the session cookie', async () => {

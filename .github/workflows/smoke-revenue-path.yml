@@ -1,0 +1,52 @@
+name: Post-deploy smoke test — revenue path
+
+# Verifies the one real revenue flow (public intake -> durable database
+# write -> dashboard visibility) against an already-deployed, live URL.
+# This is deliberately separate from ci.yml: ci.yml is hermetic (no
+# network, runs pre-deploy on every push/PR); this workflow is the
+# opposite on purpose — it only means something run against a real
+# deployment, so it triggers on GitHub's `deployment_status` event
+# (posted automatically by Vercel's GitHub integration once a deploy
+# finishes) rather than on push.
+#
+# Scoped to the production environment only: preview deployments may not
+# have DASHBOARD_PASSWORD / Supabase credentials configured, and this
+# test writes a real (sentinel, idempotent) row through the live API.
+#
+# `workflow_dispatch` is included so this can be run and proven on demand
+# without waiting for Vercel's deployment_status to actually fire — that
+# trigger's presence in this repo has not been independently confirmed.
+
+on:
+  deployment_status:
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: 'URL to smoke test (defaults to the SMOKE_BASE_URL repository variable)'
+        required: false
+        type: string
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  smoke:
+    name: verify live revenue path
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' || (github.event.deployment_status.state == 'success' && github.event.deployment.environment == 'production')
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - run: npm ci
+
+      - name: Run smoke test against the live deployment
+        env:
+          DASHBOARD_PASSWORD: ${{ secrets.DASHBOARD_PASSWORD }}
+          SMOKE_BASE_URL: ${{ github.event.inputs.base_url || vars.SMOKE_BASE_URL || github.event.deployment_status.target_url }}
+        run: npm run smoke

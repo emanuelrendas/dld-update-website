@@ -511,9 +511,16 @@ export async function handleTelemetryRequest(path, context = {}) {
 
   // 5. Full Executive Dashboard Snapshot (JSON)
   if (normalized === 'overview' || normalized === 'status') {
+    /* fetchPipelineSummary() already catches its own errors and returns a
+       safe fallback object, so a Supabase hiccup degrades this one field,
+       not the whole dashboard snapshot. */
+    const pipeline = await supabase.fetchPipelineSummary();
     return {
       status: 200,
-      body: executiveDashboard.getDashboardData(),
+      body: {
+        ...executiveDashboard.getDashboardData(),
+        pipeline,
+      },
     };
   }
 
