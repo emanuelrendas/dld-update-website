@@ -513,7 +513,7 @@ export async function handleTelemetryRequest(path, context = {}) {
   if (normalized === 'overview' || normalized === 'status') {
     return {
       status: 200,
-      body: executiveDashboard.getDashboardData(),
+      body: await executiveDashboard.getDashboardData(),
     };
   }
 

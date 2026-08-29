@@ -20,7 +20,7 @@ export class AutonomousDailyOperations {
    * Generates Morning Executive Brief (08:00 GST Routine)
    */
   async runMorningExecutiveBrief() {
-    const dashboard = executiveDashboard.getDashboardData();
+    const dashboard = await executiveDashboard.getDashboardData();
     const opportunities = opportunityEngine.getOpenOpportunities();
     const pendingTasks = autonomousTaskManager.listTasks({ status: 'PENDING' });
 

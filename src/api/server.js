@@ -133,7 +133,7 @@ export function startApiServer(port = 3000) {
       });
 
       // Send initial snapshot
-      const snapshot = executiveDashboard.getDashboardData();
+      const snapshot = await executiveDashboard.getDashboardData();
       const connectors = connectorHealthMatrix.getAllConnectorHealth();
       res.write(`data: ${JSON.stringify({ type: 'SNAPSHOT', data: snapshot, connectors })}\n\n`);
 

@@ -16,12 +16,19 @@ import { autonomousTaskManager } from './autonomous-task-manager.js';
 import { executiveLongTermMemory } from '../memory/executive-long-term-memory.js';
 import { businessIntelligenceBus } from '../events/business-intelligence-bus.js';
 import { telemetry } from '../logging/telemetry.js';
+import { supabase } from '../db/supabase-client.js';
 
 export class ExecutiveDashboard {
   /**
    * Retrieves the full executive dashboard snapshot
    */
-  getDashboardData() {
+  async getDashboardData() {
+    // Real production leads from Supabase (`leads` table), the same source
+    // handleLeadSubmission writes to. dataSource tells the dashboard whether
+    // this is live production data or the local-dev in-memory fallback, so
+    // the UI never presents fallback numbers as if they were real leads.
+    const leadPipeline = await supabase.fetchPipelineSummary().catch(() => null);
+
     const kpis = kpiCollector.getOperationalKpis();
     const queueStatus = priorityTaskDispatcher.getQueueStatus();
     const taskManagerQueue = autonomousTaskManager.getQueueStats();
@@ -63,6 +70,17 @@ export class ExecutiveDashboard {
       openOpportunities: openOpportunities.slice(0, 10),
       recentStrategicDecisions: recentDecisions,
       biDomainMetrics: biMetrics.domainCounts,
+      leadPipeline: leadPipeline
+        ? {
+            dataSource: supabase.isMock ? 'MOCK_FALLBACK' : 'SUPABASE_LIVE',
+            totalPipelineRevenueAed: leadPipeline.totalPipelineRevenueAed,
+            projectedCommissionsAed: leadPipeline.projectedCommissionsAed,
+            activeDealsCount: leadPipeline.activeDealsCount,
+            stageBreakdown: leadPipeline.stageBreakdown,
+            recentLeads: leadPipeline.recentDeals,
+            fetchedAt: leadPipeline.timestamp,
+          }
+        : { dataSource: 'UNAVAILABLE', recentLeads: [] },
       memoryStats: {
         ...memoryStats,
         cognitiveMemoryStats,
