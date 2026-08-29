@@ -76,8 +76,8 @@ export class OperatingCenter {
     return await jarvis.executeObjective(humanObjective, contextData);
   }
 
-  getDashboard() {
-    return executiveDashboard.getDashboardData();
+  async getDashboard() {
+    return await executiveDashboard.getDashboardData();
   }
 
   getDailyBriefing() {

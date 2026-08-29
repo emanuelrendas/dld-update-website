@@ -7,7 +7,8 @@
   "scripts": {
     "check": "for f in $(find api src -name '*.js'); do node --check \"$f\" || exit 1; done",
     "test": "node --test tests/integration/*.test.js",
-    "build": "npm run check && npm test"
+    "build": "npm run check && npm test",
+    "smoke": "node tools/smoke-test.mjs"
   },
   "dependencies": {
     "nodemailer": "9.0.6"

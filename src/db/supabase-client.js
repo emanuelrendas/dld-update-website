@@ -450,108 +450,99 @@ export class SupabaseClient {
     }
   }
 
+  /**
+   * Real production lead visibility for the executive dashboard.
+   *
+   * `totalLeadCount` is an exact count (Supabase `count=exact`), deliberately
+   * decoupled from `recentLeads` (a small, capped list for display) — the two
+   * used to be conflated via `leads.length` on a `.limit(50)` fetch, which
+   * silently undercounted past 50 rows.
+   *
+   * There is no numeric revenue field on `leads` (only the string
+   * `budget_band`), so no AED total is synthesized here — earlier code
+   * invented one from columns (`budget_aed`, `property_value_aed`) that do
+   * not exist in this schema, which is why it always fell back to a fixed
+   * default. `executive_briefs` is also not queried: that table does not
+   * exist in this database (see lead-routes.js header comment).
+   *
+   * On a real failure this throws instead of returning a fabricated
+   * fallback object — callers decide how to surface that, but they get an
+   * honest error, not silent fake success.
+   */
   async fetchPipelineSummary() {
     if (this.isMock) {
       const leads = this.mockStore.leads || [];
-      const briefs = this.mockStore.executive_briefs || [];
-
-      const totalRevenueAed = leads.reduce((acc, l) => {
-        const val = Number(l.budget_aed || l.budget || l.property_value_aed || (l.metadata && l.metadata.budget) || 15000000);
-        return acc + val;
-      }, 0) || 45000000;
 
       const stageBreakdown = {
         newLeads: leads.filter((l) => l.status === 'new' || l.status === 'pending').length,
         qualified: leads.filter((l) => l.status === 'qualified' || l.status === 'triaged').length,
-        proposalSent: briefs.length,
         negotiation: leads.filter((l) => l.status === 'negotiating').length,
         closedWon: leads.filter((l) => l.status === 'closed_won' || l.status === 'completed').length,
       };
 
-      const tierBreakdown = {
-        sovereignInstitutional: briefs.filter((b) => b.dira_tier === 'SOVEREIGN_INSTITUTIONAL' || b.riis_score >= 85).length,
-        highNetWorth: briefs.filter((b) => b.dira_tier === 'HIGH_NET_WORTH' || (b.riis_score >= 70 && b.riis_score < 85)).length,
-        standard: briefs.filter((b) => !b.dira_tier || b.dira_tier === 'QUALIFIED_INVESTOR' || b.riis_score < 70).length,
-      };
-
-      const recentDeals = leads.slice(-10).reverse().map((l) => ({
+      const recentLeads = leads.slice(-10).reverse().map((l) => ({
         id: l.id,
-        investorName: l.full_name || l.name || 'Private Investor',
+        name: l.name || l.full_name || null,
         email: l.email || null,
-        budgetAed: Number(l.budget_aed || l.budget || 15000000),
-        community: l.community || l.preferred_location || 'Palm Jumeirah',
-        status: l.status || 'QUALIFIED',
+        budgetBand: l.budget_band || null,
+        status: l.status || 'new',
+        source: l.source || l.origin || null,
         createdAt: l.created_at || new Date().toISOString(),
       }));
 
       return {
-        totalPipelineRevenueAed: totalRevenueAed,
-        projectedCommissionsAed: Math.round(totalRevenueAed * 0.02),
-        activeDealsCount: leads.length || 3,
+        totalLeadCount: leads.length,
         stageBreakdown,
-        tierBreakdown,
-        recentDeals,
+        recentLeads,
         timestamp: new Date().toISOString(),
       };
     }
 
-    try {
-      const [leadsRes, briefsRes] = await Promise.all([
-        fetch(`${this.url}/rest/v1/leads?select=*&order=created_at.desc&limit=50`, {
-          headers: { apikey: this.key, Authorization: `Bearer ${this.key}` },
-        }),
-        fetch(`${this.url}/rest/v1/executive_briefs?select=*&order=created_at.desc&limit=50`, {
-          headers: { apikey: this.key, Authorization: `Bearer ${this.key}` },
-        }),
-      ]);
+    const authHeaders = { apikey: this.key, Authorization: `Bearer ${this.key}` };
 
-      const leads = leadsRes.ok ? await leadsRes.json() : [];
-      const briefs = briefsRes.ok ? await briefsRes.json() : [];
-
-      const totalRevenueAed = leads.reduce((acc, l) => {
-        const val = Number(l.budget_aed || l.budget || (l.metadata && l.metadata.budget) || 15000000);
-        return acc + val;
-      }, 0) || 45000000;
-
-      return {
-        totalPipelineRevenueAed: totalRevenueAed,
-        projectedCommissionsAed: Math.round(totalRevenueAed * 0.02),
-        activeDealsCount: leads.length,
-        stageBreakdown: {
-          newLeads: leads.filter((l) => l.status === 'new' || l.status === 'pending').length,
-          qualified: leads.filter((l) => l.status === 'qualified' || l.status === 'triaged').length,
-          proposalSent: briefs.length,
-          negotiation: leads.filter((l) => l.status === 'negotiating').length,
-          closedWon: leads.filter((l) => l.status === 'closed_won' || l.status === 'completed').length,
-        },
-        tierBreakdown: {
-          sovereignInstitutional: briefs.filter((b) => b.dira_tier === 'SOVEREIGN_INSTITUTIONAL' || b.riis_score >= 85).length,
-          highNetWorth: briefs.filter((b) => b.dira_tier === 'HIGH_NET_WORTH' || (b.riis_score >= 70 && b.riis_score < 85)).length,
-          standard: briefs.filter((b) => !b.dira_tier || b.dira_tier === 'QUALIFIED_INVESTOR' || b.riis_score < 70).length,
-        },
-        recentDeals: leads.slice(0, 10).map((l) => ({
-          id: l.id,
-          investorName: l.full_name || l.name || 'Private Investor',
-          email: l.email,
-          budgetAed: Number(l.budget_aed || l.budget || 15000000),
-          community: l.community || l.preferred_location || 'Dubai Prime',
-          status: l.status || 'QUALIFIED',
-          createdAt: l.created_at,
-        })),
-        timestamp: new Date().toISOString(),
-      };
-    } catch (err) {
-      logger.error('SUPABASE', 'Failed to fetch pipeline summary', { error: err.message });
-      return {
-        totalPipelineRevenueAed: 45000000,
-        projectedCommissionsAed: 900000,
-        activeDealsCount: 3,
-        stageBreakdown: { newLeads: 1, qualified: 1, proposalSent: 1, negotiation: 0, closedWon: 0 },
-        tierBreakdown: { sovereignInstitutional: 1, highNetWorth: 1, standard: 1 },
-        recentDeals: [],
-        timestamp: new Date().toISOString(),
-      };
+    const leadsRes = await fetch(
+      `${this.url}/rest/v1/leads?select=id,name,email,budget_band,status,source,created_at&order=created_at.desc&limit=50`,
+      { headers: authHeaders },
+    );
+    if (!leadsRes.ok) {
+      throw new Error(`Supabase fetchPipelineSummary: leads fetch failed ${leadsRes.status} ${leadsRes.statusText}`);
     }
+    const leads = await leadsRes.json();
+
+    // Exact total count, independent of the limit(50) list above — a
+    // count=exact request against the full table, not the length of a
+    // capped fetch.
+    const countRes = await fetch(`${this.url}/rest/v1/leads?select=id&limit=1`, {
+      headers: { ...authHeaders, Prefer: 'count=exact' },
+    });
+    if (!countRes.ok) {
+      throw new Error(`Supabase fetchPipelineSummary: count fetch failed ${countRes.status} ${countRes.statusText}`);
+    }
+    const contentRange = countRes.headers.get('content-range');
+    const totalLeadCount = contentRange ? Number(contentRange.split('/')[1]) : NaN;
+    if (!Number.isFinite(totalLeadCount)) {
+      throw new Error('Supabase fetchPipelineSummary: could not parse exact lead count from Content-Range header');
+    }
+
+    return {
+      totalLeadCount,
+      stageBreakdown: {
+        newLeads: leads.filter((l) => l.status === 'new' || l.status === 'pending').length,
+        qualified: leads.filter((l) => l.status === 'qualified' || l.status === 'triaged').length,
+        negotiation: leads.filter((l) => l.status === 'negotiating').length,
+        closedWon: leads.filter((l) => l.status === 'closed_won' || l.status === 'completed').length,
+      },
+      recentLeads: leads.slice(0, 10).map((l) => ({
+        id: l.id,
+        name: l.name || null,
+        email: l.email || null,
+        budgetBand: l.budget_band || null,
+        status: l.status || 'new',
+        source: l.source || null,
+        createdAt: l.created_at,
+      })),
+      timestamp: new Date().toISOString(),
+    };
   }
 
   async recordAlert(alert) {

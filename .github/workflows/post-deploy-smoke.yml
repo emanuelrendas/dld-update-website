@@ -1,0 +1,31 @@
+name: Post-Deploy Smoke Test
+
+# Fires on the real deployment_status event GitHub's Vercel integration
+# posts after each deploy — not a synthetic schedule. Only runs the smoke
+# test once a deployment has actually succeeded, against the URL Vercel
+# reports for that deployment.
+on:
+  deployment_status:
+
+jobs:
+  smoke:
+    name: Real HTTP smoke test against deployed URL
+    runs-on: ubuntu-latest
+    if: github.event.deployment_status.state == 'success'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # DASHBOARD_PASSWORD is optional: without it the script still proves
+      # the deployment is up and the auth gate is enforced, and prints a
+      # clear SKIP (not a false pass) for the authenticated live-lead-data
+      # check. Add DASHBOARD_PASSWORD as a repository secret (it already
+      # exists as a Vercel production env var) to unlock that full check.
+      - name: Run smoke test against the deployed URL
+        env:
+          BASE_URL: ${{ github.event.deployment_status.target_url }}
+          DASHBOARD_PASSWORD: ${{ secrets.DASHBOARD_PASSWORD }}
+        run: npm run smoke

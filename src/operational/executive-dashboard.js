@@ -16,12 +16,14 @@ import { autonomousTaskManager } from './autonomous-task-manager.js';
 import { executiveLongTermMemory } from '../memory/executive-long-term-memory.js';
 import { businessIntelligenceBus } from '../events/business-intelligence-bus.js';
 import { telemetry } from '../logging/telemetry.js';
+import { supabase } from '../db/supabase-client.js';
+import { logger } from '../logging/audit-logger.js';
 
 export class ExecutiveDashboard {
   /**
    * Retrieves the full executive dashboard snapshot
    */
-  getDashboardData() {
+  async getDashboardData() {
     const kpis = kpiCollector.getOperationalKpis();
     const queueStatus = priorityTaskDispatcher.getQueueStatus();
     const taskManagerQueue = autonomousTaskManager.getQueueStats();
@@ -34,6 +36,23 @@ export class ExecutiveDashboard {
     const biMetrics = businessIntelligenceBus.getMetrics();
     const telemetrySnapshot = telemetry.getSnapshot();
 
+    // Real production lead visibility. Failure here degrades only this
+    // section of the dashboard, visibly (`ok: false` + `error`), instead of
+    // either fabricating numbers or failing the entire snapshot.
+    let leads;
+    try {
+      const pipeline = await supabase.fetchPipelineSummary();
+      leads = {
+        ok: true,
+        totalLeadCount: pipeline.totalLeadCount,
+        recentLeads: pipeline.recentLeads,
+        stageBreakdown: pipeline.stageBreakdown,
+      };
+    } catch (err) {
+      logger.error('EXECUTIVE_DASHBOARD', 'Failed to fetch live lead data', { error: err.message });
+      leads = { ok: false, error: err.message };
+    }
+
     return {
       status: 'OPERATIONAL',
       title: 'RAIOC JARVIS Executive Operating Center (JOS v1.0)',
@@ -45,10 +64,11 @@ export class ExecutiveDashboard {
         uptimeSeconds: Math.round(process.uptime()),
       },
       financials: {
-        pipelineRevenueAed: biMetrics.pipelineRevenueAed || 25000000,
-        projectedCommissionsAed: Math.round((biMetrics.pipelineRevenueAed || 25000000) * 0.02),
+        pipelineRevenueAed: biMetrics.pipelineRevenueAed || 0,
+        projectedCommissionsAed: Math.round((biMetrics.pipelineRevenueAed || 0) * 0.02),
         totalOpportunitiesValueAed: openOpportunities.reduce((acc, o) => acc + (o.estimatedValueAed || 0), 0),
       },
+      leads,
       currentObjectives: autonomousTaskManager.listTasks({ status: 'IN_PROGRESS' }).map((t) => ({
         id: t.id,
         objective: t.objective,

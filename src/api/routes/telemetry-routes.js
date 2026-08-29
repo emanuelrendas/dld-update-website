@@ -397,14 +397,22 @@ export async function handleTelemetryRequest(path, context = {}) {
 
   // 2c. Executive Deal Pipeline: GET /api/executive/pipeline
   if (path === '/api/executive/pipeline' || normalized === 'pipeline') {
-    const pipelineData = await supabase.fetchPipelineSummary();
-    return {
-      status: 200,
-      body: {
-        success: true,
-        ...pipelineData,
-      },
-    };
+    try {
+      const pipelineData = await supabase.fetchPipelineSummary();
+      return {
+        status: 200,
+        body: {
+          success: true,
+          ...pipelineData,
+        },
+      };
+    } catch (err) {
+      logger.error('TELEMETRY', 'Failed to fetch executive pipeline', { error: err.message });
+      return {
+        status: 502,
+        body: { success: false, error: 'Failed to fetch live pipeline data', detail: err.message },
+      };
+    }
   }
 
   // 2d. Executive Operational Alerts: GET /api/executive/alerts
@@ -513,7 +521,7 @@ export async function handleTelemetryRequest(path, context = {}) {
   if (normalized === 'overview' || normalized === 'status') {
     return {
       status: 200,
-      body: executiveDashboard.getDashboardData(),
+      body: await executiveDashboard.getDashboardData(),
     };
   }
 
