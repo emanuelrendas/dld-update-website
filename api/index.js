@@ -9,7 +9,10 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { routeApiRequest } from '../src/api/server.js';
 import { renderCommandCenterHtml } from '../src/dashboard/command-center-html.js';
+import { renderDashboardLoginPage } from '../src/dashboard/dashboard-login-html.js';
 import { sitePages } from '../src/site/site-pages.js';
+import { dashboardSessionManager } from '../src/security/dashboard-session.js';
+import { resolveCorsHeaders } from '../src/api/cors.js';
 
 export default async function handler(req, res) {
   const headers = req.headers || {};
@@ -18,6 +21,19 @@ export default async function handler(req, res) {
   const body = req.body || {};
   const host = (headers.host || headers['x-forwarded-host'] || '').toLowerCase();
 
+  // Credentialed CORS for allowlisted dashboard origins only; everything else
+  // keeps the previous public, credential-less '*' behavior.
+  const corsHeaders = resolveCorsHeaders(headers.origin);
+  for (const [k, v] of Object.entries(corsHeaders)) {
+    res.setHeader(k, v);
+  }
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-API-Key, X-Correlation-ID, X-N8N-Signature, X-Hub-Signature-256');
+  if (method === 'OPTIONS') {
+    res.status(204);
+    return typeof res.send === 'function' ? res.send('') : res.end();
+  }
+
   // Extract actual requested URL from query parameter or matched path header
   let url = query.__path || headers['x-matched-path'] || req.url || '/';
   url = url.split('?')[0]; // strip query string for route matching
@@ -25,8 +41,23 @@ export default async function handler(req, res) {
   // Clean duplicate /api prefixes if any occurred from rewrites (e.g. /api/api/health -> /api/health)
   url = url.replace(/^\/api\/api\//, '/api/');
 
-  // 1. Dashboard Subdomain (dashboard.emanuelrendas.com) or '/dashboard'
-  if (host.includes('dashboard') || url === '/dashboard' || url === '/dashboard/' || url === '/dashboard.html' || url === '/api/dashboard/ui') {
+  // 1. Dashboard Subdomain (dashboard.emanuelrendas.com) or '/dashboard' - the HTML
+  // shell only. '/api/*' paths on the dashboard host fall through to section 4 so
+  // /api/dashboard/login, /overview, etc. are still authenticated there.
+  const isDashboardShellRequest =
+    (host.includes('dashboard') && !url.startsWith('/api/')) ||
+    url === '/dashboard' || url === '/dashboard/' || url === '/dashboard.html' || url === '/api/dashboard/ui';
+
+  if (isDashboardShellRequest) {
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+    res.status(200);
+
+    if (!dashboardSessionManager.verifyRequest(headers)) {
+      const loginHtml = renderDashboardLoginPage({ notConfigured: !dashboardSessionManager.isConfigured() });
+      return typeof res.send === 'function' ? res.send(loginHtml) : res.end(loginHtml);
+    }
+
     let dashHtml = '';
     try {
       const candidates = [
@@ -45,9 +76,6 @@ export default async function handler(req, res) {
     if (!dashHtml) {
       dashHtml = renderCommandCenterHtml();
     }
-    res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
-    res.status(200);
     return typeof res.send === 'function' ? res.send(dashHtml) : res.end(dashHtml);
   }
 

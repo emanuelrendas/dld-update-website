@@ -9,7 +9,25 @@ export const config = {
   service: {
     name: 'raioc-os',
     port: parseInt(process.env.PORT || '3000', 10),
-    internalKey: process.env.INTERNAL_SERVICE_KEY || 'raioc_sec_default_dev_key',
+    // No fallback: an unset key must fail closed, never authenticate against a
+    // default. See src/security/auth-middleware.js.
+    internalKey: process.env.INTERNAL_SERVICE_KEY || '',
+  },
+  dashboard: {
+    // Human login for the browser dashboard, separate from the machine-to-machine
+    // INTERNAL_SERVICE_KEY. No fallback: unset means login is disabled (fail closed).
+    password: process.env.DASHBOARD_PASSWORD || '',
+    sessionSecret: process.env.DASHBOARD_SESSION_SECRET || '',
+    sessionTtlMs: parseInt(process.env.DASHBOARD_SESSION_TTL_MS || String(12 * 60 * 60 * 1000), 10),
+  },
+  security: {
+    // Origins allowed to make credentialed (cookie-bearing) cross-origin requests,
+    // e.g. dashboard.emanuelrendas.com calling api.emanuelrendas.com.
+    dashboardOrigins: (process.env.DASHBOARD_ALLOWED_ORIGINS ||
+      'https://dashboard.emanuelrendas.com,https://www.emanuelrendas.com,https://emanuelrendas.com')
+      .split(',')
+      .map((o) => o.trim())
+      .filter(Boolean),
   },
   supabase: {
     url: process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || '',

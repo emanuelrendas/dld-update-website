@@ -31,6 +31,13 @@ export class AuthMiddleware {
       return { authenticated: true, role: Roles.PUBLIC };
     }
 
+    // Fail closed: an unset/empty service key must never authenticate a request,
+    // regardless of what token the caller presents.
+    if (!this.internalKey) {
+      logger.error('AUTH_MIDDLEWARE', 'Rejecting request: INTERNAL_SERVICE_KEY is not configured (failing closed)');
+      return { authenticated: false, error: 'Service authentication is not configured' };
+    }
+
     const authHeader = headers['authorization'] || headers['Authorization'] || '';
     const apiKeyHeader = headers['x-api-key'] || headers['X-API-Key'] || '';
 

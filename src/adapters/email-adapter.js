@@ -146,7 +146,7 @@ export class EmailAdapter {
     if (!cfg.user || !cfg.password) {
       const diagMsg = `Missing SMTP credentials: SMTP_USER='${cfg.user || '[EMPTY]'}', SMTP_PASSWORD exists=${Boolean(cfg.password)} (length=${cfg.password ? cfg.password.length : 0}).`;
       
-      // If live sending was explicitly requested (e.g. via /api/test-email), throw descriptive error
+      // If live sending was explicitly requested, throw a descriptive error instead of silently no-op'ing
       if (options.requireLiveSend) {
         const error = new Error(`[SMTP_AUTH_ERROR] ${diagMsg} Please configure SMTP_USER and SMTP_PASSWORD in Vercel Environment Variables.`);
         error.code = 'E_MISSING_CREDENTIALS';

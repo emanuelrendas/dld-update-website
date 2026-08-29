@@ -21,6 +21,8 @@ import { agentEventBus } from '../events/agent-event-bus.js';
 import { executiveDashboard } from '../operational/executive-dashboard.js';
 import { connectorHealthMatrix } from '../monitoring/connector-health-matrix.js';
 import { logger } from '../logging/audit-logger.js';
+import { dashboardSessionManager } from '../security/dashboard-session.js';
+import { resolveCorsHeaders } from './cors.js';
 
 export async function routeApiRequest(reqPath, method = 'GET', body = {}, query = {}, headers = {}) {
   const url = reqPath.split('?')[0];
@@ -32,8 +34,8 @@ export async function routeApiRequest(reqPath, method = 'GET', body = {}, query 
   return await correlationTracer.runWithContext({ correlationId }, async () => {
     let response;
 
-    // 1. Dashboard UI, Executive Telemetry & Connectors (/dashboard, /api/dashboard/*, /api/executive/*, /api/telemetry/*, /health, /api/health, /api/test-email)
-    if (url === '/dashboard' || url === '/api/test-email' || url.startsWith('/api/dashboard') || url.startsWith('/api/telemetry') || url.startsWith('/api/executive') || url === '/health' || url === '/api/health') {
+    // 1. Dashboard UI, Executive Telemetry & Connectors (/dashboard, /api/dashboard/*, /api/executive/*, /api/telemetry/*, /health, /api/health)
+    if (url === '/dashboard' || url.startsWith('/api/dashboard') || url.startsWith('/api/telemetry') || url.startsWith('/api/executive') || url === '/health' || url === '/api/health') {
       response = await handleTelemetryRequest(url, { headers, query, body });
     }
     // 2. DLD Market Data
@@ -97,8 +99,13 @@ export async function routeApiRequest(reqPath, method = 'GET', body = {}, query 
  */
 export function startApiServer(port = 3000) {
   const server = createServer(async (req, res) => {
-    // Enable CORS for frontend integration
-    res.setHeader('Access-Control-Allow-Origin', '*');
+    // Enable CORS for frontend integration. Credentialed (cookie-bearing) requests
+    // are only permitted from allowlisted dashboard origins; everything else gets
+    // the public, credential-less '*' behavior unchanged.
+    const corsHeaders = resolveCorsHeaders(req.headers.origin || req.headers.Origin);
+    for (const [k, v] of Object.entries(corsHeaders)) {
+      res.setHeader(k, v);
+    }
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-API-Key, X-Correlation-ID, X-N8N-Signature, X-Hub-Signature-256');
 
@@ -113,6 +120,12 @@ export function startApiServer(port = 3000) {
 
     // --- Realtime SSE Stream Endpoint ---
     if (parsedUrl.pathname === '/api/dashboard/stream' || parsedUrl.pathname === '/api/realtime') {
+      if (!dashboardSessionManager.verifyRequest(req.headers)) {
+        res.writeHead(401, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Dashboard session required' }));
+        return;
+      }
+
       res.writeHead(200, {
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache',

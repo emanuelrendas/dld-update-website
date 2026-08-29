@@ -259,8 +259,10 @@ export async function runProductionPipelineVerification(customOptions = {}) {
 
     // 12. Stage 12: Dashboard Feeds & Health Heartbeat
     let dashboardHealth;
-    await recordStage(12, 'Dashboard Feeds & Health Heartbeat (/api/dashboard/health)', async () => {
-      const healthRes = await routeApiRequest('/api/dashboard/health');
+    await recordStage(12, 'Dashboard Feeds & Health Heartbeat (/api/health)', async () => {
+      // /api/dashboard/health now requires a human dashboard session (MISSION-006);
+      // /api/health is the same underlying health snapshot and stays public.
+      const healthRes = await routeApiRequest('/api/health');
       if (healthRes.status !== 200 || healthRes.body.status !== 'HEALTHY') {
         throw new Error(`Dashboard health returned abnormal status: ${JSON.stringify(healthRes.body)}`);
       }
